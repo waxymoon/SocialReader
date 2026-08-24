@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>SocialReader 内容采集台</title>
+  <style>
+    :root {
+      --paper: #f5f3ee;
+      --surface: #ffffff;
+      --ink: #17212b;
+      --muted: #65717c;
+      --line: #dfe3e5;
+      --blue: #164c63;
+      --blue-soft: #e5f0f3;
+      --coral: #eb644b;
+      --coral-soft: #fff0ec;
+      --green: #26715b;
+      --green-soft: #e7f3ee;
+      --amber: #9a6418;
+      --amber-soft: #fff4db;
+      --shadow: 0 16px 45px rgba(28, 44, 53, .08);
+      --radius: 20px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: "Segoe UI", "Microsoft YaHei UI", "Microsoft YaHei", sans-serif;
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .shell { width: min(1180px, calc(100% - 36px)); margin: 0 auto; padding: 28px 0 60px; }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 28px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark {
+      width: 42px; height: 42px; border-radius: 13px; display: grid; place-items: center;
+      color: white; background: var(--blue); font-weight: 800; letter-spacing: -.05em;
+      box-shadow: 0 8px 18px rgba(22, 76, 99, .22);
+    }
+    .brand strong { display: block; font-size: 17px; letter-spacing: -.02em; }
+    .brand span { color: var(--muted); font-size: 12px; }
+    .browser-pill { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 999px; background: rgba(255,255,255,.68); color: var(--muted); font-size: 13px; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: #b6bec3; }
+    .browser-pill.ready .dot { background: #32a477; box-shadow: 0 0 0 4px rgba(50,164,119,.12); }
+    .hero { margin: 16px 0 26px; }
+    .eyebrow { margin: 0 0 8px; color: var(--coral); font-size: 13px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+    h1 { margin: 0; max-width: 720px; font-size: clamp(34px, 5vw, 58px); line-height: 1.07; letter-spacing: -.045em; }
+    .hero-copy { max-width: 680px; margin: 16px 0 0; color: var(--muted); font-size: 16px; line-height: 1.75; }
+    .grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(340px, .95fr); gap: 20px; align-items: start; }
+    .card { background: var(--surface); border: 1px solid rgba(210,216,219,.8); border-radius: var(--radius); box-shadow: var(--shadow); }
+    .card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; padding: 22px 24px 0; }
+    .card-head h2 { margin: 0; font-size: 19px; letter-spacing: -.02em; }
+    .card-head p { margin: 7px 0 0; color: var(--muted); font-size: 13px; }
+    .form-body { padding: 22px 24px 24px; }
+    .platforms { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+    .platform { position: relative; }
+    .platform input { position: absolute; opacity: 0; pointer-events: none; }
+    .platform label { display: block; min-height: 86px; padding: 14px; border: 1px solid var(--line); border-radius: 15px; background: #fafbfa; transition: .18s ease; }
+    .platform label:hover { border-color: #aebbc0; transform: translateY(-1px); }
+    .platform input:checked + label { border-color: var(--blue); background: var(--blue-soft); box-shadow: inset 0 0 0 1px var(--blue); }
+    .platform b { display: block; margin-bottom: 6px; font-size: 15px; }
+    .platform small { color: var(--muted); line-height: 1.4; }
+    .field { margin-bottom: 17px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    label.field-label { display: block; margin-bottom: 7px; font-size: 13px; font-weight: 700; }
+    .input, .select { width: 100%; height: 48px; border: 1px solid var(--line); border-radius: 12px; background: #fbfcfb; color: var(--ink); outline: none; padding: 0 13px; transition: .18s; }
+    .input:focus, .select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(22,76,99,.1); background: white; }
+    .helper { display: block; margin-top: 6px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .actions { display: flex; gap: 10px; margin-top: 22px; }
+    .btn { min-height: 46px; border: 0; border-radius: 12px; padding: 0 17px; font-weight: 750; transition: .18s ease; }
+    .btn:hover:not(:disabled) { transform: translateY(-1px); }
+    .btn:disabled { cursor: not-allowed; opacity: .48; }
+    .btn-primary { flex: 1; color: white; background: var(--coral); box-shadow: 0 8px 18px rgba(235,100,75,.22); }
+    .btn-secondary { color: var(--blue); background: var(--blue-soft); }
+    .btn-ghost { color: var(--muted); background: #f0f2f1; }
+    .status-card { overflow: hidden; }
+    .status-top { padding: 23px 24px 18px; background: var(--blue); color: white; }
+    .status-line { display: flex; align-items: center; justify-content: space-between; gap: 15px; }
+    .status-line h2 { margin: 0; font-size: 19px; }
+    .state-chip { padding: 7px 10px; border-radius: 999px; background: rgba(255,255,255,.15); font-size: 12px; font-weight: 700; }
+    .status-message { min-height: 48px; margin: 18px 0 5px; color: rgba(255,255,255,.9); font-size: 15px; line-height: 1.55; }
+    .progress { height: 8px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.16); }
+    .progress-bar { height: 100%; width: 0; border-radius: inherit; background: #ffb29f; transition: width .35s ease; }
+    .metrics { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--line); }
+    .metric { padding: 15px 16px; text-align: center; }
+    .metric + .metric { border-left: 1px solid var(--line); }
+    .metric strong { display: block; margin-bottom: 3px; font-size: 20px; }
+    .metric span { color: var(--muted); font-size: 11px; }
+    .login-box { display: none; margin: 16px 18px 0; padding: 15px; border: 1px solid #efd69e; border-radius: 14px; background: var(--amber-soft); }
+    .login-box.show { display: block; }
+    .login-box b { display: block; color: #744a10; margin-bottom: 5px; }
+    .login-box p { margin: 0 0 12px; color: #795a2d; font-size: 13px; line-height: 1.5; }
+    .login-box .btn { width: 100%; background: var(--amber); color: white; }
+    .log-wrap { padding: 17px 18px 18px; }
+    .log-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 9px; }
+    .log-head b { font-size: 13px; }
+    .log-head span { color: var(--muted); font-size: 11px; }
+    .log { height: 272px; overflow: auto; margin: 0; padding: 14px; border-radius: 13px; color: #d8e6ea; background: #15232a; font: 12px/1.65 Consolas, "Microsoft YaHei UI", monospace; white-space: pre-wrap; word-break: break-word; }
+    .status-actions { display: flex; gap: 8px; padding: 0 18px 18px; }
+    .status-actions .btn { flex: 1; min-height: 40px; font-size: 13px; }
+    .library { margin-top: 20px; overflow: hidden; }
+    .library-toolbar { display: flex; gap: 8px; }
+    .library-toolbar .btn { min-height: 38px; padding: 0 12px; font-size: 12px; }
+    .file-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 11px; padding: 18px 24px 24px; }
+    .file { min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 14px; background: #fbfcfb; transition: .18s; cursor: pointer; }
+    .file:hover { border-color: #aebbc0; transform: translateY(-2px); }
+    .file-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 9px; }
+    .file-tag { padding: 4px 7px; border-radius: 7px; color: var(--blue); background: var(--blue-soft); font-size: 10px; font-weight: 800; }
+    .file time { color: var(--muted); font-size: 10px; }
+    .file b { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; min-height: 42px; font-size: 14px; line-height: 1.5; }
+    .file small { display: block; overflow: hidden; margin-top: 9px; color: var(--muted); text-overflow: ellipsis; white-space: nowrap; }
+    .empty { grid-column: 1 / -1; padding: 30px; color: var(--muted); text-align: center; border: 1px dashed var(--line); border-radius: 14px; }
+    dialog { width: min(800px, calc(100% - 28px)); max-height: 86vh; padding: 0; border: 0; border-radius: 18px; box-shadow: 0 24px 80px rgba(18,32,39,.25); }
+    dialog::backdrop { background: rgba(18,32,39,.46); backdrop-filter: blur(3px); }
+    .dialog-head { position: sticky; top: 0; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 17px 20px; border-bottom: 1px solid var(--line); background: white; }
+    .dialog-head b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .icon-btn { width: 36px; height: 36px; flex: 0 0 auto; border: 0; border-radius: 10px; color: var(--muted); background: #f0f2f1; }
+    .preview { margin: 0; padding: 22px; color: #24323a; background: #fbfcfb; font: 13px/1.75 Consolas, "Microsoft YaHei UI", monospace; white-space: pre-wrap; word-break: break-word; }
+    .toast { position: fixed; right: 24px; bottom: 24px; z-index: 10; max-width: 360px; padding: 13px 16px; border-radius: 12px; color: white; background: #24323a; box-shadow: var(--shadow); transform: translateY(20px); opacity: 0; pointer-events: none; transition: .22s; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    @media (max-width: 860px) {
+      .grid { grid-template-columns: 1fr; }
+      .file-list { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 560px) {
+      .shell { width: min(100% - 22px, 1180px); padding-top: 18px; }
+      header { align-items: flex-start; }
+      .brand span { display: none; }
+      h1 { font-size: 38px; }
+      .platforms, .file-list { grid-template-columns: 1fr; }
+      .platform label { min-height: auto; }
+      .field-row { grid-template-columns: 1fr; }
+      .card-head, .form-body { padding-left: 18px; padding-right: 18px; }
+      .file-list { padding-left: 18px; padding-right: 18px; }
+      .library .card-head { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">SR</div>
+        <div><strong>SocialReader</strong><span>本地内容采集工作台</span></div>
+      </div>
+      <div id="browserPill" class="browser-pill"><span class="dot"></span><span id="browserText">正在检查 9333…</span></div>
+    </header>
+
+    <section class="hero">
+      <p class="eyebrow">Capture · Transcribe · Archive</p>
+      <h1>把刷到的内容，<br>变成可搜索的素材。</h1>
+      <p class="hero-copy">选择平台、输入关键词，搜索、正文与评论提取、图文归档、视频转写和 Markdown 入库都交给流水线。</p>
+    </section>
+
+    <section class="grid">
+      <form id="captureForm" class="card" autocomplete="off">
+        <div class="card-head">
+          <div><h2>新建采集</h2><p>任务启动后会先请你在调试浏览器确认登录。</p></div>
+        </div>
+        <div class="form-body">
+          <div class="platforms" role="radiogroup" aria-label="采集平台">
+            <div class="platform"><input id="xhs" name="platform" type="radio" value="xhs" checked><label for="xhs"><b>小红书</b><small>图文 + 视频<br>正文 + 评论 + 转写</small></label></div>
+            <div class="platform"><input id="dy" name="platform" type="radio" value="dy"><label for="dy"><b>抖音内容</b><small>视频 + 图文<br>文案 + 图片 + 转写</small></label></div>
+            <div class="platform"><input id="dyvideo" name="platform" type="radio" value="dyvideo"><label for="dyvideo"><b>抖音单条</b><small>粘贴链接<br>直接转写</small></label></div>
+          </div>
+          <div class="field">
+            <label id="queryLabel" class="field-label" for="query">搜索关键词</label>
+            <input id="query" class="input" name="query" required maxlength="300" placeholder="例如：AI 工具">
+            <small id="queryHelp" class="helper">程序会搜索并处理前 N 条内容。</small>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label" for="maximum">采集数量</label>
+              <input id="maximum" class="input" name="maximum" type="number" min="1" max="20" value="3">
+            </div>
+            <div id="modelField" class="field">
+              <label class="field-label" for="model">转写模型</label>
+              <select id="model" class="select" name="model">
+                <option value="tiny">Tiny · 最快</option>
+                <option value="base">Base · 较快</option>
+                <option value="small" selected>Small · 推荐</option>
+                <option value="medium">Medium · 更准更慢</option>
+              </select>
+              <small class="helper">仅视频内容会调用转写模型。</small>
+            </div>
+          </div>
+          <div class="actions">
+            <button id="startBtn" class="btn btn-primary" type="submit">开始采集</button>
+            <button id="startBrowserBtn" class="btn btn-secondary" type="button">启动调试浏览器</button>
+          </div>
+        </div>
+      </form>
+
+      <aside class="card status-card" aria-live="polite">
+        <div class="status-top">
+          <div class="status-line"><h2>任务进度</h2><span id="stateChip" class="state-chip">空闲</span></div>
+          <p id="statusMessage" class="status-message">等待开始。先确认右上角调试浏览器显示“已连接”。</p>
+          <div class="progress" aria-label="任务进度"><div id="progressBar" class="progress-bar"></div></div>
+        </div>
+        <div class="metrics">
+          <div class="metric"><strong id="progressMetric">0/0</strong><span>当前进度</span></div>
+          <div class="metric"><strong id="successMetric">0</strong><span>成功</span></div>
+          <div class="metric"><strong id="failedMetric">0</strong><span>失败</span></div>
+        </div>
+        <div id="loginBox" class="login-box">
+          <b>需要你确认登录</b>
+          <p>请切到调试浏览器完成扫码或登录，再点下面的按钮。</p>
+          <button id="confirmLoginBtn" class="btn" type="button">我已登录，继续</button>
+        </div>
+        <div class="log-wrap">
+          <div class="log-head"><b>实时日志</b><span>自动刷新</span></div>
+          <pre id="log" class="log">尚未启动任务。</pre>
+        </div>
+        <div class="status-actions">
+          <button id="stopBtn" class="btn btn-ghost" type="button" disabled>停止当前任务</button>
+          <button id="openOutputBtn" class="btn btn-secondary" type="button">打开输出文件夹</button>
+        </div>
+      </aside>
+    </section>
+
+    <section class="card library">
+      <div class="card-head">
+        <div><h2>最近采集</h2><p>点击卡片可直接预览 Markdown 内容。</p></div>
+        <div class="library-toolbar"><button id="refreshFilesBtn" class="btn btn-ghost" type="button">刷新列表</button></div>
+      </div>
+      <div id="fileList" class="file-list"><div class="empty">正在读取采集目录…</div></div>
+    </section>
+  </main>
+
+  <dialog id="previewDialog">
+    <div class="dialog-head"><b id="previewTitle">Markdown 预览</b><button id="closePreviewBtn" class="icon-btn" aria-label="关闭预览">✕</button></div>
+    <pre id="previewContent" class="preview"></pre>
+  </dialog>
+  <div id="toast" class="toast" role="status"></div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const stateNames = {idle:'空闲', starting:'启动中', awaiting_login:'等待登录', running:'采集中', stopping:'停止中', stopped:'已停止', done:'已完成', failed:'未完成'};
+    let lastLogSize = -1;
+    let latestRunning = false;
+
+    async function api(path, options = {}) {
+      const response = await fetch(path, {headers:{'Content-Type':'application/json'}, ...options});
+      const data = await response.json().catch(() => ({ok:false,error:'服务器返回了无法解析的内容'}));
+      if (!response.ok || !data.ok) throw new Error(data.error || `请求失败 (${response.status})`);
+      return data;
+    }
+
+    function toast(message) {
+      const el = $('toast'); el.textContent = message; el.classList.add('show');
+      clearTimeout(toast.timer); toast.timer = setTimeout(() => el.classList.remove('show'), 2800);
+    }
+
+    function selectedPlatform() { return document.querySelector('input[name="platform"]:checked').value; }
+    function updateFormMode() {
+      const platform = selectedPlatform();
+      const single = platform === 'dyvideo';
+      $('queryLabel').textContent = single ? '抖音视频链接' : '搜索关键词';
+      $('query').placeholder = single ? 'https://www.douyin.com/video/…' : '例如：AI 工具';
+      $('queryHelp').textContent = single ? '粘贴一个抖音详情链接，直接下载并转写。' : '程序会搜索并处理前 N 条内容。';
+      $('maximum').disabled = single;
+      $('modelField').style.opacity = '1';
+      $('model').disabled = false;
+    }
+
+    function renderStatus(data) {
+      const job = data.job;
+      latestRunning = job.running;
+      $('browserPill').classList.toggle('ready', data.browser_ready);
+      $('browserText').textContent = data.browser_ready ? '调试浏览器已连接' : '9333 未连接';
+      $('stateChip').textContent = stateNames[job.state] || job.state;
+      $('statusMessage').textContent = job.message || '等待开始';
+      $('progressMetric').textContent = `${job.current || 0}/${job.total || job.maximum || 0}`;
+      $('successMetric').textContent = job.success || 0;
+      $('failedMetric').textContent = job.failed || 0;
+      const denominator = job.total || job.maximum || 0;
+      const percent = job.state === 'done' ? 100 : denominator ? Math.min(100, (job.current || 0) / denominator * 100) : 0;
+      $('progressBar').style.width = `${percent}%`;
+      $('loginBox').classList.toggle('show', !!job.can_confirm);
+      $('stopBtn').disabled = !job.running;
+      $('startBtn').disabled = !!job.running;
+      $('startBrowserBtn').disabled = data.browser_ready;
+      $('startBrowserBtn').textContent = data.browser_ready ? '浏览器已启动' : '启动调试浏览器';
+      if (job.logs.length !== lastLogSize) {
+        const log = $('log');
+        log.textContent = job.logs.length ? job.logs.join('\n') : '尚未启动任务。';
+        log.scrollTop = log.scrollHeight;
+        lastLogSize = job.logs.length;
+      }
+      if (job.state === 'done' && !renderStatus.doneId?.includes(job.id)) {
+        renderStatus.doneId = (renderStatus.doneId || '') + job.id;
+        loadFiles();
+      }
+    }
+
+    async function refreshStatus() {
+      try { renderStatus(await api('/api/status')); }
+      catch (error) { $('browserText').textContent = '服务连接失败'; }
+    }
+
+    async function loadFiles() {
+      const list = $('fileList');
+      try {
+        const data = await api('/api/files');
+        if (!data.files.length) { list.innerHTML = '<div class="empty">还没有采集文件，完成第一条任务后会显示在这里。</div>'; return; }
+        list.innerHTML = '';
+        data.files.forEach(file => {
+          const item = document.createElement('article'); item.className = 'file'; item.tabIndex = 0;
+          item.innerHTML = `<div class="file-top"><span class="file-tag">${file.is_summary ? '汇总' : 'Markdown'}</span><time>${file.modified}</time></div><b></b><small></small>`;
+          item.querySelector('b').textContent = file.name.replace(/\.md$/i, '');
+          item.querySelector('small').textContent = file.folder;
+          const open = () => previewFile(file.relative);
+          item.addEventListener('click', open);
+          item.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') open(); });
+          list.appendChild(item);
+        });
+      } catch (error) { list.innerHTML = `<div class="empty">读取失败：${error.message}</div>`; }
+    }
+
+    async function previewFile(relative) {
+      try {
+        const data = await api(`/api/file?relative=${encodeURIComponent(relative)}`);
+        $('previewTitle').textContent = data.file.name;
+        $('previewContent').textContent = data.content;
+        $('previewDialog').showModal();
+      } catch (error) { toast(error.message); }
+    }
+
+    document.querySelectorAll('input[name="platform"]').forEach(input => input.addEventListener('change', updateFormMode));
+    $('captureForm').addEventListener('submit', async event => {
+      event.preventDefault();
+      const platform = selectedPlatform();
+      const payload = {platform, query:$('query').value.trim(), maximum:platform === 'dyvideo' ? 1 : Number($('maximum').value), model:$('model').value};
+      if (!payload.query) { toast(platform === 'dyvideo' ? '请粘贴抖音视频链接' : '请输入搜索关键词'); $('query').focus(); return; }
+      try { renderStatus({browser_ready:$('browserPill').classList.contains('ready'), job:(await api('/api/start',{method:'POST',body:JSON.stringify(payload)})).job}); }
+      catch (error) { toast(error.message); }
+    });
+    $('confirmLoginBtn').addEventListener('click', async () => {
+      try { renderStatus({browser_ready:true, job:(await api('/api/confirm-login',{method:'POST',body:'{}'})).job}); }
+      catch (error) { toast(error.message); }
+    });
+    $('stopBtn').addEventListener('click', async () => {
+      if (!confirm('确定停止当前采集任务吗？已写入的文件会保留。')) return;
+      try { await api('/api/stop',{method:'POST',body:'{}'}); toast('正在停止任务'); }
+      catch (error) { toast(error.message); }
+    });
+    $('startBrowserBtn').addEventListener('click', async () => {
+      try { const data = await api('/api/start-browser',{method:'POST',body:'{}'}); toast(data.message); setTimeout(refreshStatus, 2200); }
+      catch (error) { toast(error.message); }
+    });
+    $('openOutputBtn').addEventListener('click', async () => {
+      try { await api('/api/open-output',{method:'POST',body:'{}'}); }
+      catch (error) { toast(error.message); }
+    });
+    $('refreshFilesBtn').addEventListener('click', loadFiles);
+    $('closePreviewBtn').addEventListener('click', () => $('previewDialog').close());
+    $('previewDialog').addEventListener('click', event => { if (event.target === $('previewDialog')) $('previewDialog').close(); });
+
+    updateFormMode(); refreshStatus(); loadFiles(); setInterval(refreshStatus, 1100);
+  </script>
+</body>
+</html>
