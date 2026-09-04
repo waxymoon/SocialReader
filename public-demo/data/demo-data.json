@@ -1,0 +1,1051 @@
+{
+  "generated_from": "deliverables/pre_capture_demo",
+  "snapshot_at": "2026-09-04T02:15:06+08:00",
+  "run_id": "food_20260904_021506_1c4dde",
+  "model": "none_rules_only",
+  "notice": "公开演示读取本地已归档快照，不进行实时抓取。",
+  "gold_status": "insufficient_human_gold",
+  "gold_inventory": {
+    "total_real_cases": 5,
+    "approved_gold_cases": 0,
+    "approved_gold_sentences": 0,
+    "platform_counts": {
+      "xhs": 3,
+      "dy": 2
+    },
+    "categories": [
+      "奶茶",
+      "轻食"
+    ],
+    "secondary_annotation_cases": 0,
+    "secondary_coverage": null,
+    "requirements": {
+      "cases": 24,
+      "sentences": 60,
+      "xhs": 12,
+      "dy": 12,
+      "categories": 5,
+      "secondary_coverage": 0.2
+    }
+  },
+  "datasets": [
+    {
+      "query": "三文鱼波奇饭",
+      "platforms": [
+        "小红书"
+      ],
+      "source_kind": "real_local_capture",
+      "metrics": {
+        "candidate_pool": 27,
+        "detail_success": 3,
+        "evidence_total": 23,
+        "rule_pass": 8,
+        "rule_fail": 15,
+        "selected_candidates": 8,
+        "human_pending": 23
+      },
+      "cards": [
+        {
+          "content_id": "xhs_6879bd72000000002001af78",
+          "title": "三文鱼拌饭（日料店版）",
+          "platform": "小红书",
+          "published_at": "2025-07-18 11:20:18 +0800",
+          "source_url": "https://www.xiaohongshu.com/search_result/6879bd72000000002001af78?xsec_token=ABiCC6WWtdqZHMFRnJCs87oAJ01V8vLgmWJ8QwjOzDxoY%3D&xsec_source=",
+          "metrics": {
+            "favorites": 93000,
+            "comments": 1357,
+            "shares": 0
+          },
+          "metric_coverage": 0.75,
+          "novelty": "not_new",
+          "hotness": "insufficient_evidence",
+          "food_items": [
+            {
+              "food_name": "三文鱼",
+              "ingredients": [
+                "三文鱼",
+                "温泉蛋",
+                "米饭",
+                "虾",
+                "鱼子"
+              ],
+              "textures": [],
+              "flavors": []
+            }
+          ]
+        },
+        {
+          "content_id": "xhs_69d86c9800000000220017d3",
+          "title": "一口塞不下‼️大块三文鱼堆到溢出来🍣",
+          "platform": "小红书",
+          "published_at": "2026-04-10 11:20:56 +0800",
+          "source_url": "https://www.xiaohongshu.com/search_result/69d86c9800000000220017d3?xsec_token=AB5ytmDkPcGRRLdvO_JJSoLPlBJDnWM4p3L-g6tRDFgs4%3D&xsec_source=",
+          "metrics": {
+            "likes": 21000,
+            "favorites": 8178,
+            "comments": 345,
+            "shares": 0
+          },
+          "metric_coverage": 1.0,
+          "novelty": "not_new",
+          "hotness": "insufficient_evidence",
+          "food_items": [
+            {
+              "food_name": "三文鱼",
+              "ingredients": [
+                "三文鱼",
+                "牛油果",
+                "米饭",
+                "飞鱼籽"
+              ],
+              "textures": [
+                "厚实",
+                "绵密"
+              ],
+              "flavors": []
+            }
+          ]
+        },
+        {
+          "content_id": "xhs_69f31826000000001f00789b",
+          "title": "三文鱼波奇饭（百吃不厌版）",
+          "platform": "小红书",
+          "published_at": "2026-04-30 16:51:50 +0800",
+          "source_url": "https://www.xiaohongshu.com/search_result/69f31826000000001f00789b?xsec_token=ABpYEjZqc1Pt2ZZ6TCD1LzcRdM9QKkHHg3YRh3sn9StoE%3D&xsec_source=",
+          "metrics": {
+            "likes": 19000,
+            "favorites": 18000,
+            "comments": 331,
+            "shares": 0
+          },
+          "metric_coverage": 1.0,
+          "novelty": "not_new",
+          "hotness": "insufficient_evidence",
+          "food_items": [
+            {
+              "food_name": "三文鱼波奇饭",
+              "ingredients": [
+                "三文鱼",
+                "温泉蛋",
+                "牛油果",
+                "米饭",
+                "飞鱼籽",
+                "鱼子"
+              ],
+              "textures": [
+                "嫩",
+                "软嫩"
+              ],
+              "flavors": [
+                "油脂香",
+                "香"
+              ]
+            }
+          ]
+        }
+      ],
+      "evidences": [
+        {
+          "evidence_id": "ev_xhs_6879bd72000000002001af78_001",
+          "exact_quote": "1比1复刻的三文鱼拌饭，五天炫了三碗",
+          "evidence_location": "paragraph_1",
+          "source_type": "body",
+          "aspect": "吃法/做法",
+          "target": "三文鱼",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "三文鱼拌饭（日料店版）",
+          "source_url": "https://www.xiaohongshu.com/search_result/6879bd72000000002001af78?xsec_token=ABiCC6WWtdqZHMFRnJCs87oAJ01V8vLgmWJ8QwjOzDxoY%3D&xsec_source="
+        },
+        {
+          "evidence_id": "ev_xhs_6879bd72000000002001af78_002",
+          "exact_quote": "煮波你什么时候变成这个样子了：2",
+          "evidence_location": "comment_9",
+          "source_type": "comment",
+          "aspect": "吃法/做法",
+          "target": "三文鱼",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "三文鱼拌饭（日料店版）",
+          "source_url": "https://www.xiaohongshu.com/search_result/6879bd72000000002001af78?xsec_token=ABiCC6WWtdqZHMFRnJCs87oAJ01V8vLgmWJ8QwjOzDxoY%3D&xsec_source="
+        },
+        {
+          "evidence_id": "ev_xhs_6879bd72000000002001af78_003",
+          "exact_quote": "不用开火",
+          "evidence_location": "0007.4s-0008.2s",
+          "source_type": "video_transcript",
+          "aspect": "吃法/做法",
+          "target": "三文鱼",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "三文鱼拌饭（日料店版）",
+          "source_url": "https://www.xiaohongshu.com/search_result/6879bd72000000002001af78?xsec_token=ABiCC6WWtdqZHMFRnJCs87oAJ01V8vLgmWJ8QwjOzDxoY%3D&xsec_source="
+        },
+        {
+          "evidence_id": "ev_xhs_6879bd72000000002001af78_004",
+          "exact_quote": "随便切一切半一半",
+          "evidence_location": "0008.2s-0009.7s",
+          "source_type": "video_transcript",
+          "aspect": "吃法/做法",
+          "target": "三文鱼",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "三文鱼拌饭（日料店版）",
+          "source_url": "https://www.xiaohongshu.com/search_result/6879bd72000000002001af78?xsec_token=ABiCC6WWtdqZHMFRnJCs87oAJ01V8vLgmWJ8QwjOzDxoY%3D&xsec_source="
+        },
+        {
+          "evidence_id": "ev_xhs_6879bd72000000002001af78_005",
+          "exact_quote": "150克的三文鱼切真丁",
+          "evidence_location": "0016.4s-0018.3s",
+          "source_type": "video_transcript",
+          "aspect": "吃法/做法",
+          "target": "三文鱼",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "三文鱼拌饭（日料店版）",
+          "source_url": "https://www.xiaohongshu.com/search_result/6879bd72000000002001af78?xsec_token=ABiCC6WWtdqZHMFRnJCs87oAJ01V8vLgmWJ8QwjOzDxoY%3D&xsec_source="
+        },
+        {
+          "evidence_id": "ev_xhs_6879bd72000000002001af78_006",
+          "exact_quote": "混合搅拌在一起",
+          "evidence_location": "0025.8s-0027.0s",
+          "source_type": "video_transcript",
+          "aspect": "吃法/做法",
+          "target": "三文鱼",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "三文鱼拌饭（日料店版）",
+          "source_url": "https://www.xiaohongshu.com/search_result/6879bd72000000002001af78?xsec_token=ABiCC6WWtdqZHMFRnJCs87oAJ01V8vLgmWJ8QwjOzDxoY%3D&xsec_source="
+        },
+        {
+          "evidence_id": "ev_xhs_6879bd72000000002001af78_007",
+          "exact_quote": "倒入切好的三文鱼点",
+          "evidence_location": "0027.0s-0028.5s",
+          "source_type": "video_transcript",
+          "aspect": "吃法/做法",
+          "target": "三文鱼",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "三文鱼拌饭（日料店版）",
+          "source_url": "https://www.xiaohongshu.com/search_result/6879bd72000000002001af78?xsec_token=ABiCC6WWtdqZHMFRnJCs87oAJ01V8vLgmWJ8QwjOzDxoY%3D&xsec_source="
+        },
+        {
+          "evidence_id": "ev_xhs_6879bd72000000002001af78_008",
+          "exact_quote": "煮中在一起",
+          "evidence_location": "0037.2s-0038.2s",
+          "source_type": "video_transcript",
+          "aspect": "吃法/做法",
+          "target": "三文鱼",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "三文鱼拌饭（日料店版）",
+          "source_url": "https://www.xiaohongshu.com/search_result/6879bd72000000002001af78?xsec_token=ABiCC6WWtdqZHMFRnJCs87oAJ01V8vLgmWJ8QwjOzDxoY%3D&xsec_source="
+        },
+        {
+          "evidence_id": "ev_xhs_69d86c9800000000220017d3_001",
+          "exact_quote": "三文鱼切得超大块超厚实，直接铺满一碗还冒尖",
+          "evidence_location": "paragraph_2",
+          "source_type": "body",
+          "aspect": "口感",
+          "target": "三文鱼",
+          "rule_review_status": "pass",
+          "human_review_status": "pending",
+          "title": "一口塞不下‼️大块三文鱼堆到溢出来🍣",
+          "source_url": "https://www.xiaohongshu.com/search_result/69d86c9800000000220017d3?xsec_token=AB5ytmDkPcGRRLdvO_JJSoLPlBJDnWM4p3L-g6tRDFgs4%3D&xsec_source="
+        },
+        {
+          "evidence_id": "ev_xhs_69d86c9800000000220017d3_002",
+          "exact_quote": "搭配绵密牛油果，颜值和满足感双双拉满",
+          "evidence_location": "paragraph_3",
+          "source_type": "body",
+          "aspect": "口感",
+          "target": "牛油果",
+          "rule_review_status": "pass",
+          "human_review_status": "pending",
+          "title": "一口塞不下‼️大块三文鱼堆到溢出来🍣",
+          "source_url": "https://www.xiaohongshu.com/search_result/69d86c9800000000220017d3?xsec_token=AB5ytmDkPcGRRLdvO_JJSoLPlBJDnWM4p3L-g6tRDFgs4%3D&xsec_source="
+        },
+        {
+          "evidence_id": "ev_xhs_69f31826000000001f00789b_001",
+          "exact_quote": "不用开火，随便切一切拌一拌就可以的三文鱼波奇饭，真是好吃又方便",
+          "evidence_location": "paragraph_1",
+          "source_type": "body",
+          "aspect": "吃法/做法",
+          "target": "三文鱼波奇饭",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "三文鱼波奇饭（百吃不厌版）",
+          "source_url": "https://www.xiaohongshu.com/search_result/69f31826000000001f00789b?xsec_token=ABpYEjZqc1Pt2ZZ6TCD1LzcRdM9QKkHHg3YRh3sn9StoE%3D&xsec_source="
+        },
+        {
+          "evidence_id": "ev_xhs_69f31826000000001f00789b_002",
+          "exact_quote": "二百克的三个鱼切成钉",
+          "evidence_location": "0008.8s-0010.5s",
+          "source_type": "video_transcript",
+          "aspect": "吃法/做法",
+          "target": "三文鱼波奇饭",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "三文鱼波奇饭（百吃不厌版）",
+          "source_url": "https://www.xiaohongshu.com/search_result/69f31826000000001f00789b?xsec_token=ABpYEjZqc1Pt2ZZ6TCD1LzcRdM9QKkHHg3YRh3sn9StoE%3D&xsec_source="
+        },
+        {
+          "evidence_id": "ev_xhs_69f31826000000001f00789b_003",
+          "exact_quote": "混合均匀 搅拌在一起",
+          "evidence_location": "0015.6s-0017.2s",
+          "source_type": "video_transcript",
+          "aspect": "吃法/做法",
+          "target": "三文鱼波奇饭",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "三文鱼波奇饭（百吃不厌版）",
+          "source_url": "https://www.xiaohongshu.com/search_result/69f31826000000001f00789b?xsec_token=ABpYEjZqc1Pt2ZZ6TCD1LzcRdM9QKkHHg3YRh3sn9StoE%3D&xsec_source="
+        },
+        {
+          "evidence_id": "ev_xhs_69f31826000000001f00789b_004",
+          "exact_quote": "少许的牛蒙蒸防止氧化",
+          "evidence_location": "0024.9s-0026.8s",
+          "source_type": "video_transcript",
+          "aspect": "吃法/做法",
+          "target": "三文鱼波奇饭",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "三文鱼波奇饭（百吃不厌版）",
+          "source_url": "https://www.xiaohongshu.com/search_result/69f31826000000001f00789b?xsec_token=ABpYEjZqc1Pt2ZZ6TCD1LzcRdM9QKkHHg3YRh3sn9StoE%3D&xsec_source="
+        },
+        {
+          "evidence_id": "ev_xhs_69f31826000000001f00789b_005",
+          "exact_quote": "煮装在一起",
+          "evidence_location": "0034.5s-0035.4s",
+          "source_type": "video_transcript",
+          "aspect": "吃法/做法",
+          "target": "三文鱼波奇饭",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "三文鱼波奇饭（百吃不厌版）",
+          "source_url": "https://www.xiaohongshu.com/search_result/69f31826000000001f00789b?xsec_token=ABpYEjZqc1Pt2ZZ6TCD1LzcRdM9QKkHHg3YRh3sn9StoE%3D&xsec_source="
+        },
+        {
+          "evidence_id": "ev_xhs_69f31826000000001f00789b_006",
+          "exact_quote": "不用开火",
+          "evidence_location": "0037.9s-0038.7s",
+          "source_type": "video_transcript",
+          "aspect": "吃法/做法",
+          "target": "三文鱼波奇饭",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "三文鱼波奇饭（百吃不厌版）",
+          "source_url": "https://www.xiaohongshu.com/search_result/69f31826000000001f00789b?xsec_token=ABpYEjZqc1Pt2ZZ6TCD1LzcRdM9QKkHHg3YRh3sn9StoE%3D&xsec_source="
+        },
+        {
+          "evidence_id": "ev_xhs_69f31826000000001f00789b_007",
+          "exact_quote": "随便切一切半一半就可以了",
+          "evidence_location": "0038.7s-0040.7s",
+          "source_type": "video_transcript",
+          "aspect": "吃法/做法",
+          "target": "三文鱼波奇饭",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "三文鱼波奇饭（百吃不厌版）",
+          "source_url": "https://www.xiaohongshu.com/search_result/69f31826000000001f00789b?xsec_token=ABpYEjZqc1Pt2ZZ6TCD1LzcRdM9QKkHHg3YRh3sn9StoE%3D&xsec_source="
+        },
+        {
+          "evidence_id": "ev_xhs_69f31826000000001f00789b_008",
+          "exact_quote": "美味爆炸",
+          "evidence_location": "0042.5s-0043.4s",
+          "source_type": "video_transcript",
+          "aspect": "吃法/做法",
+          "target": "三文鱼波奇饭",
+          "rule_review_status": "pass",
+          "human_review_status": "pending",
+          "title": "三文鱼波奇饭（百吃不厌版）",
+          "source_url": "https://www.xiaohongshu.com/search_result/69f31826000000001f00789b?xsec_token=ABpYEjZqc1Pt2ZZ6TCD1LzcRdM9QKkHHg3YRh3sn9StoE%3D&xsec_source="
+        },
+        {
+          "evidence_id": "ev_xhs_69f31826000000001f00789b_009",
+          "exact_quote": "三分鱼软嫩",
+          "evidence_location": "0043.4s-0044.4s",
+          "source_type": "video_transcript",
+          "aspect": "口感",
+          "target": "三文鱼波奇饭",
+          "rule_review_status": "pass",
+          "human_review_status": "pending",
+          "title": "三文鱼波奇饭（百吃不厌版）",
+          "source_url": "https://www.xiaohongshu.com/search_result/69f31826000000001f00789b?xsec_token=ABpYEjZqc1Pt2ZZ6TCD1LzcRdM9QKkHHg3YRh3sn9StoE%3D&xsec_source="
+        },
+        {
+          "evidence_id": "ev_xhs_69f31826000000001f00789b_010",
+          "exact_quote": "油脂香而不膩",
+          "evidence_location": "0044.4s-0045.6s",
+          "source_type": "video_transcript",
+          "aspect": "味道",
+          "target": "三文鱼波奇饭",
+          "rule_review_status": "pass",
+          "human_review_status": "pending",
+          "title": "三文鱼波奇饭（百吃不厌版）",
+          "source_url": "https://www.xiaohongshu.com/search_result/69f31826000000001f00789b?xsec_token=ABpYEjZqc1Pt2ZZ6TCD1LzcRdM9QKkHHg3YRh3sn9StoE%3D&xsec_source="
+        },
+        {
+          "evidence_id": "ev_xhs_69f31826000000001f00789b_011",
+          "exact_quote": "再和米饭牛果一起入口",
+          "evidence_location": "0046.5s-0048.5s",
+          "source_type": "video_transcript",
+          "aspect": "体验",
+          "target": "米饭",
+          "rule_review_status": "pass",
+          "human_review_status": "pending",
+          "title": "三文鱼波奇饭（百吃不厌版）",
+          "source_url": "https://www.xiaohongshu.com/search_result/69f31826000000001f00789b?xsec_token=ABpYEjZqc1Pt2ZZ6TCD1LzcRdM9QKkHHg3YRh3sn9StoE%3D&xsec_source="
+        },
+        {
+          "evidence_id": "ev_xhs_69f31826000000001f00789b_012",
+          "exact_quote": "越吃越香",
+          "evidence_location": "0048.5s-0049.6s",
+          "source_type": "video_transcript",
+          "aspect": "味道",
+          "target": "三文鱼波奇饭",
+          "rule_review_status": "pass",
+          "human_review_status": "pending",
+          "title": "三文鱼波奇饭（百吃不厌版）",
+          "source_url": "https://www.xiaohongshu.com/search_result/69f31826000000001f00789b?xsec_token=ABpYEjZqc1Pt2ZZ6TCD1LzcRdM9QKkHHg3YRh3sn9StoE%3D&xsec_source="
+        },
+        {
+          "evidence_id": "ev_xhs_69f31826000000001f00789b_013",
+          "exact_quote": "口感层色丰富几乙了",
+          "evidence_location": "0049.6s-0051.5s",
+          "source_type": "video_transcript",
+          "aspect": "体验",
+          "target": "三文鱼波奇饭",
+          "rule_review_status": "pass",
+          "human_review_status": "pending",
+          "title": "三文鱼波奇饭（百吃不厌版）",
+          "source_url": "https://www.xiaohongshu.com/search_result/69f31826000000001f00789b?xsec_token=ABpYEjZqc1Pt2ZZ6TCD1LzcRdM9QKkHHg3YRh3sn9StoE%3D&xsec_source="
+        }
+      ],
+      "candidates": [
+        {
+          "content_id": "xhs_69f31826000000001f00789b",
+          "title": "三文鱼波奇饭（百吃不厌版）",
+          "author": "是阿齐呀🍿",
+          "platform": "xhs",
+          "likes": 19000,
+          "published_at": "2026-04-30",
+          "rising_score": 0.736538,
+          "source_url": "https://www.xiaohongshu.com/search_result/69f31826000000001f00789b?xsec_token=ABpYEjZqc1Pt2ZZ6TCD1LzcRdM9QKkHHg3YRh3sn9StoE%3D&xsec_source="
+        },
+        {
+          "content_id": "xhs_6975cc41000000000a030261",
+          "title": "年夜饭颜值担当‼️三文鱼波奇饭解腻封神",
+          "author": "小花的美食分享",
+          "platform": "xhs",
+          "likes": 19000,
+          "published_at": "2026-01-25",
+          "rising_score": 0.667308,
+          "source_url": "https://www.xiaohongshu.com/search_result/6975cc41000000000a030261?xsec_token=AB0tny9LDrUVWFJmVmpyVytwmT21iE1FpPISO8ZJdCZFM%3D&xsec_source="
+        },
+        {
+          "content_id": "xhs_699fdbb9000000002203b14b",
+          "title": "一周波奇饭不重样‼️6️⃣款三文鱼波奇饭合集",
+          "author": "瓶子sweet🌻",
+          "platform": "xhs",
+          "likes": 5582,
+          "published_at": "2026-02-26",
+          "rising_score": 0.623077,
+          "source_url": "https://www.xiaohongshu.com/search_result/699fdbb9000000002203b14b?xsec_token=ABcng7z2Tpt1uddwPadHPM2I_E7wB1sjFXB1Ybnzw4L4Q%3D&xsec_source="
+        },
+        {
+          "content_id": "xhs_6a7abea40000000025015cc5",
+          "title": "拜见杭州三文鱼波奇饭大王！！！！！",
+          "author": "艺天",
+          "platform": "xhs",
+          "likes": 2294,
+          "published_at": "2026-08-11",
+          "rising_score": 0.773077,
+          "source_url": "https://www.xiaohongshu.com/search_result/6a7abea40000000025015cc5?xsec_token=ABLVUs6hl6EfC-DBS7B20_i2bEA2WhI49xppY-7M7IsLA%3D&xsec_source="
+        },
+        {
+          "content_id": "xhs_69df6525000000001a029c1a",
+          "title": "三文鱼波奇饭｜减脂期也能吃的满足感晚餐",
+          "author": "范饱饱_77",
+          "platform": "xhs",
+          "likes": 2268,
+          "published_at": "2026-07-30",
+          "rising_score": 0.7,
+          "source_url": "https://www.xiaohongshu.com/search_result/69df6525000000001a029c1a?xsec_token=ABB_G-t0fdWF74kxuvUqOfjMu8Vr3B9-fDmcKqW2bz-Ug%3D&xsec_source="
+        },
+        {
+          "content_id": "xhs_6a58dd690000000005039979",
+          "title": "清清爽爽的三文鱼波奇饭🍣",
+          "author": "可可奶酪🧀",
+          "platform": "xhs",
+          "likes": 387,
+          "published_at": "2026-07-16",
+          "rising_score": 0.396154,
+          "source_url": "https://www.xiaohongshu.com/search_result/6a58dd690000000005039979?xsec_token=ABPSc6CfN4CCVGC9sitVy1iQvP871G4Yk1mrXKQGubByI%3D&xsec_source="
+        },
+        {
+          "content_id": "xhs_68de1fc10000000007017c80",
+          "title": "第一个发明三文鱼波奇饭的真是老吃家",
+          "author": "草莓招了",
+          "platform": "xhs",
+          "likes": 329,
+          "published_at": "2025-10-02",
+          "rising_score": 0.184615,
+          "source_url": "https://www.xiaohongshu.com/search_result/68de1fc10000000007017c80?xsec_token=AB83y8ngiGmadMKaIB3oiezq0WfjX3uV7CBVZphfO2fAI%3D&xsec_source="
+        },
+        {
+          "content_id": "xhs_69fb2fee0000000022028a5e",
+          "title": "减脂期最爱的牛油果三文鱼波奇饭",
+          "author": "粥末鱼快",
+          "platform": "xhs",
+          "likes": 1593,
+          "published_at": "2026-05-06",
+          "rising_score": 0.503846,
+          "source_url": "https://www.xiaohongshu.com/search_result/69fb2fee0000000022028a5e?xsec_token=ABoDzMypPxEqEftrT3v4vAfLZ683lifTYSNA0Cbh4zk_4%3D&xsec_source="
+        }
+      ],
+      "pool_note": "同平台、同关键词、同一次可见候选池；仅作相对比较。"
+    },
+    {
+      "query": "奶茶新品",
+      "platforms": [
+        "抖音"
+      ],
+      "source_kind": "real_local_capture",
+      "metrics": {
+        "candidate_pool": null,
+        "detail_success": 2,
+        "evidence_total": 32,
+        "rule_pass": 16,
+        "rule_fail": 16,
+        "selected_candidates": null,
+        "human_pending": 32
+      },
+      "cards": [
+        {
+          "content_id": "dy_7673749761677102336",
+          "title": "终于喝懂了！一点点可可芭蕾回归4🔥款DIY隐藏点单攻略！ 无广测评！！",
+          "platform": "抖音",
+          "published_at": "2026-08-14 15:28:00 +0800",
+          "source_url": "https://www.douyin.com/video/7673749761677102336",
+          "metrics": {
+            "likes": 1451,
+            "favorites": 472,
+            "comments": 60,
+            "shares": 799
+          },
+          "metric_coverage": 1.0,
+          "novelty": "not_new",
+          "hotness": "insufficient_evidence",
+          "food_items": [
+            {
+              "food_name": "奶茶",
+              "ingredients": [],
+              "textures": [],
+              "flavors": [
+                "奶香",
+                "香"
+              ]
+            }
+          ]
+        },
+        {
+          "content_id": "dy_7676925624883597174",
+          "title": "泰奶居然还有隐藏喝法…在泰奶冰沙里喝到人生珍珠！ #测评 #奶茶 #一起喝奶茶 #泰奶 #抖音美食创作人",
+          "platform": "抖音",
+          "published_at": "2026-08-23 10:00:00 +0800",
+          "source_url": "https://www.douyin.com/video/7676925624883597174",
+          "metrics": {
+            "likes": 1548,
+            "favorites": 257,
+            "comments": 155,
+            "shares": 806
+          },
+          "metric_coverage": 1.0,
+          "novelty": "not_new",
+          "hotness": "insufficient_evidence",
+          "food_items": [
+            {
+              "food_name": "奶茶",
+              "ingredients": [],
+              "textures": [],
+              "flavors": [
+                "奶香",
+                "香"
+              ]
+            }
+          ]
+        }
+      ],
+      "evidences": [
+        {
+          "evidence_id": "ev_dy_7673749761677102336_001",
+          "exact_quote": "不过他的可可味道是很高级自然的",
+          "evidence_location": "0026.8s-0029.2s",
+          "source_type": "video_transcript",
+          "aspect": "体验",
+          "target": "",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "终于喝懂了！一点点可可芭蕾回归4🔥款DIY隐藏点单攻略！ 无广测评！！",
+          "source_url": "https://www.douyin.com/video/7673749761677102336"
+        },
+        {
+          "evidence_id": "ev_dy_7673749761677102336_002",
+          "exact_quote": "张草奶香和苦可可融合在一起",
+          "evidence_location": "0045.4s-0047.8s",
+          "source_type": "video_transcript",
+          "aspect": "味道",
+          "target": "",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "终于喝懂了！一点点可可芭蕾回归4🔥款DIY隐藏点单攻略！ 无广测评！！",
+          "source_url": "https://www.douyin.com/video/7673749761677102336"
+        },
+        {
+          "evidence_id": "ev_dy_7673749761677102336_003",
+          "exact_quote": "喝起来特别像一杯融化版的香草配巧",
+          "evidence_location": "0052.6s-0055.2s",
+          "source_type": "video_transcript",
+          "aspect": "味道",
+          "target": "",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "终于喝懂了！一点点可可芭蕾回归4🔥款DIY隐藏点单攻略！ 无广测评！！",
+          "source_url": "https://www.douyin.com/video/7673749761677102336"
+        },
+        {
+          "evidence_id": "ev_dy_7673749761677102336_004",
+          "exact_quote": "串后柔和入口售化",
+          "evidence_location": "0055.2s-0057.0s",
+          "source_type": "video_transcript",
+          "aspect": "体验",
+          "target": "",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "终于喝懂了！一点点可可芭蕾回归4🔥款DIY隐藏点单攻略！ 无广测评！！",
+          "source_url": "https://www.douyin.com/video/7673749761677102336"
+        },
+        {
+          "evidence_id": "ev_dy_7673749761677102336_005",
+          "exact_quote": "超级风服口感",
+          "evidence_location": "0063.0s-0064.0s",
+          "source_type": "video_transcript",
+          "aspect": "体验",
+          "target": "",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "终于喝懂了！一点点可可芭蕾回归4🔥款DIY隐藏点单攻略！ 无广测评！！",
+          "source_url": "https://www.douyin.com/video/7673749761677102336"
+        },
+        {
+          "evidence_id": "ev_dy_7673749761677102336_006",
+          "exact_quote": "奶香和越来越足",
+          "evidence_location": "0079.7s-0080.7s",
+          "source_type": "video_transcript",
+          "aspect": "味道",
+          "target": "",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "终于喝懂了！一点点可可芭蕾回归4🔥款DIY隐藏点单攻略！ 无广测评！！",
+          "source_url": "https://www.douyin.com/video/7673749761677102336"
+        },
+        {
+          "evidence_id": "ev_dy_7673749761677102336_007",
+          "exact_quote": "像我比较喜欢不搅拌鲜和上面的奶感",
+          "evidence_location": "0093.9s-0095.9s",
+          "source_type": "video_transcript",
+          "aspect": "吃法/做法",
+          "target": "",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "终于喝懂了！一点点可可芭蕾回归4🔥款DIY隐藏点单攻略！ 无广测评！！",
+          "source_url": "https://www.douyin.com/video/7673749761677102336"
+        },
+        {
+          "evidence_id": "ev_dy_7673749761677102336_008",
+          "exact_quote": "顶不是厚厚的一层棉米甜香买霜",
+          "evidence_location": "0095.9s-0097.9s",
+          "source_type": "video_transcript",
+          "aspect": "味道",
+          "target": "",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "终于喝懂了！一点点可可芭蕾回归4🔥款DIY隐藏点单攻略！ 无广测评！！",
+          "source_url": "https://www.douyin.com/video/7673749761677102336"
+        },
+        {
+          "evidence_id": "ev_dy_7673749761677102336_009",
+          "exact_quote": "就是用鹹鹹甜的带着淡淡的知识香气",
+          "evidence_location": "0099.1s-0102.1s",
+          "source_type": "video_transcript",
+          "aspect": "味道",
+          "target": "",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "终于喝懂了！一点点可可芭蕾回归4🔥款DIY隐藏点单攻略！ 无广测评！！",
+          "source_url": "https://www.douyin.com/video/7673749761677102336"
+        },
+        {
+          "evidence_id": "ev_dy_7673749761677102336_010",
+          "exact_quote": "不是鹹奶感就是那种奶香味的味道",
+          "evidence_location": "0102.1s-0104.7s",
+          "source_type": "video_transcript",
+          "aspect": "味道",
+          "target": "",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "终于喝懂了！一点点可可芭蕾回归4🔥款DIY隐藏点单攻略！ 无广测评！！",
+          "source_url": "https://www.douyin.com/video/7673749761677102336"
+        },
+        {
+          "evidence_id": "ev_dy_7673749761677102336_011",
+          "exact_quote": "就是鹹奶香加上黑巧苦感的风层控状",
+          "evidence_location": "0105.7s-0108.7s",
+          "source_type": "video_transcript",
+          "aspect": "味道",
+          "target": "",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "终于喝懂了！一点点可可芭蕾回归4🔥款DIY隐藏点单攻略！ 无广测评！！",
+          "source_url": "https://www.douyin.com/video/7673749761677102336"
+        },
+        {
+          "evidence_id": "ev_dy_7673749761677102336_012",
+          "exact_quote": "我入口手前是那种",
+          "evidence_location": "0151.2s-0152.6s",
+          "source_type": "video_transcript",
+          "aspect": "体验",
+          "target": "",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "终于喝懂了！一点点可可芭蕾回归4🔥款DIY隐藏点单攻略！ 无广测评！！",
+          "source_url": "https://www.douyin.com/video/7673749761677102336"
+        },
+        {
+          "evidence_id": "ev_dy_7673749761677102336_013",
+          "exact_quote": "回味出来是那种淡淡清涼感的不喝香气",
+          "evidence_location": "0154.8s-0157.4s",
+          "source_type": "video_transcript",
+          "aspect": "味道",
+          "target": "",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "终于喝懂了！一点点可可芭蕾回归4🔥款DIY隐藏点单攻略！ 无广测评！！",
+          "source_url": "https://www.douyin.com/video/7673749761677102336"
+        },
+        {
+          "evidence_id": "ev_dy_7673749761677102336_014",
+          "exact_quote": "而且它不是那种口香糖",
+          "evidence_location": "0161.6s-0162.8s",
+          "source_type": "video_transcript",
+          "aspect": "味道",
+          "target": "",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "终于喝懂了！一点点可可芭蕾回归4🔥款DIY隐藏点单攻略！ 无广测评！！",
+          "source_url": "https://www.douyin.com/video/7673749761677102336"
+        },
+        {
+          "evidence_id": "ev_dy_7676925624883597174_001",
+          "exact_quote": "能感受到一次很淡的鹹香微運",
+          "evidence_location": "0022.3s-0025.0s",
+          "source_type": "video_transcript",
+          "aspect": "味道",
+          "target": "奶茶",
+          "rule_review_status": "pass",
+          "human_review_status": "pending",
+          "title": "泰奶居然还有隐藏喝法…在泰奶冰沙里喝到人生珍珠！ #测评 #奶茶 #一起喝奶茶 #泰奶 #抖音美食创作人",
+          "source_url": "https://www.douyin.com/video/7676925624883597174"
+        },
+        {
+          "evidence_id": "ev_dy_7676925624883597174_002",
+          "exact_quote": "太熊茶被我想會焦香鹹出來",
+          "evidence_location": "0057.2s-0059.1s",
+          "source_type": "video_transcript",
+          "aspect": "味道",
+          "target": "奶茶",
+          "rule_review_status": "pass",
+          "human_review_status": "pending",
+          "title": "泰奶居然还有隐藏喝法…在泰奶冰沙里喝到人生珍珠！ #测评 #奶茶 #一起喝奶茶 #泰奶 #抖音美食创作人",
+          "source_url": "https://www.douyin.com/video/7676925624883597174"
+        },
+        {
+          "evidence_id": "ev_dy_7676925624883597174_003",
+          "exact_quote": "以下是服現奶香",
+          "evidence_location": "0059.1s-0060.2s",
+          "source_type": "video_transcript",
+          "aspect": "味道",
+          "target": "奶茶",
+          "rule_review_status": "pass",
+          "human_review_status": "pending",
+          "title": "泰奶居然还有隐藏喝法…在泰奶冰沙里喝到人生珍珠！ #测评 #奶茶 #一起喝奶茶 #泰奶 #抖音美食创作人",
+          "source_url": "https://www.douyin.com/video/7676925624883597174"
+        },
+        {
+          "evidence_id": "ev_dy_7676925624883597174_004",
+          "exact_quote": "跟茶園那個焦糖香角在一起",
+          "evidence_location": "0075.3s-0077.5s",
+          "source_type": "video_transcript",
+          "aspect": "味道",
+          "target": "奶茶",
+          "rule_review_status": "pass",
+          "human_review_status": "pending",
+          "title": "泰奶居然还有隐藏喝法…在泰奶冰沙里喝到人生珍珠！ #测评 #奶茶 #一起喝奶茶 #泰奶 #抖音美食创作人",
+          "source_url": "https://www.douyin.com/video/7676925624883597174"
+        },
+        {
+          "evidence_id": "ev_dy_7676925624883597174_005",
+          "exact_quote": "基本上我積極口感的報紙",
+          "evidence_location": "0077.5s-0078.9s",
+          "source_type": "video_transcript",
+          "aspect": "体验",
+          "target": "奶茶",
+          "rule_review_status": "pass",
+          "human_review_status": "pending",
+          "title": "泰奶居然还有隐藏喝法…在泰奶冰沙里喝到人生珍珠！ #测评 #奶茶 #一起喝奶茶 #泰奶 #抖音美食创作人",
+          "source_url": "https://www.douyin.com/video/7676925624883597174"
+        },
+        {
+          "evidence_id": "ev_dy_7676925624883597174_006",
+          "exact_quote": "而是茶香奶香",
+          "evidence_location": "0087.8s-0088.8s",
+          "source_type": "video_transcript",
+          "aspect": "味道",
+          "target": "奶茶",
+          "rule_review_status": "pass",
+          "human_review_status": "pending",
+          "title": "泰奶居然还有隐藏喝法…在泰奶冰沙里喝到人生珍珠！ #测评 #奶茶 #一起喝奶茶 #泰奶 #抖音美食创作人",
+          "source_url": "https://www.douyin.com/video/7676925624883597174"
+        },
+        {
+          "evidence_id": "ev_dy_7676925624883597174_007",
+          "exact_quote": "焦糖香層層跌出來的",
+          "evidence_location": "0088.8s-0090.4s",
+          "source_type": "video_transcript",
+          "aspect": "味道",
+          "target": "奶茶",
+          "rule_review_status": "pass",
+          "human_review_status": "pending",
+          "title": "泰奶居然还有隐藏喝法…在泰奶冰沙里喝到人生珍珠！ #测评 #奶茶 #一起喝奶茶 #泰奶 #抖音美食创作人",
+          "source_url": "https://www.douyin.com/video/7676925624883597174"
+        },
+        {
+          "evidence_id": "ev_dy_7676925624883597174_008",
+          "exact_quote": "對一杯是烤茶冰叫文",
+          "evidence_location": "0127.7s-0129.1s",
+          "source_type": "video_transcript",
+          "aspect": "吃法/做法",
+          "target": "奶茶",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "泰奶居然还有隐藏喝法…在泰奶冰沙里喝到人生珍珠！ #测评 #奶茶 #一起喝奶茶 #泰奶 #抖音美食创作人",
+          "source_url": "https://www.douyin.com/video/7676925624883597174"
+        },
+        {
+          "evidence_id": "ev_dy_7676925624883597174_009",
+          "exact_quote": "對一杯是烤清明姐",
+          "evidence_location": "0129.1s-0130.5s",
+          "source_type": "video_transcript",
+          "aspect": "吃法/做法",
+          "target": "奶茶",
+          "rule_review_status": "fail",
+          "human_review_status": "pending",
+          "title": "泰奶居然还有隐藏喝法…在泰奶冰沙里喝到人生珍珠！ #测评 #奶茶 #一起喝奶茶 #泰奶 #抖音美食创作人",
+          "source_url": "https://www.douyin.com/video/7676925624883597174"
+        },
+        {
+          "evidence_id": "ev_dy_7676925624883597174_010",
+          "exact_quote": "香淘子熟成太奶",
+          "evidence_location": "0136.3s-0137.8s",
+          "source_type": "video_transcript",
+          "aspect": "味道",
+          "target": "奶茶",
+          "rule_review_status": "pass",
+          "human_review_status": "pending",
+          "title": "泰奶居然还有隐藏喝法…在泰奶冰沙里喝到人生珍珠！ #测评 #奶茶 #一起喝奶茶 #泰奶 #抖音美食创作人",
+          "source_url": "https://www.douyin.com/video/7676925624883597174"
+        },
+        {
+          "evidence_id": "ev_dy_7676925624883597174_011",
+          "exact_quote": "大概還有若可見的滿滿的香草子",
+          "evidence_location": "0146.8s-0148.7s",
+          "source_type": "video_transcript",
+          "aspect": "味道",
+          "target": "奶茶",
+          "rule_review_status": "pass",
+          "human_review_status": "pending",
+          "title": "泰奶居然还有隐藏喝法…在泰奶冰沙里喝到人生珍珠！ #测评 #奶茶 #一起喝奶茶 #泰奶 #抖音美食创作人",
+          "source_url": "https://www.douyin.com/video/7676925624883597174"
+        },
+        {
+          "evidence_id": "ev_dy_7676925624883597174_012",
+          "exact_quote": "但是喜歡弄越甜品口感的人",
+          "evidence_location": "0153.5s-0156.0s",
+          "source_type": "video_transcript",
+          "aspect": "体验",
+          "target": "甜品",
+          "rule_review_status": "pass",
+          "human_review_status": "pending",
+          "title": "泰奶居然还有隐藏喝法…在泰奶冰沙里喝到人生珍珠！ #测评 #奶茶 #一起喝奶茶 #泰奶 #抖音美食创作人",
+          "source_url": "https://www.douyin.com/video/7676925624883597174"
+        },
+        {
+          "evidence_id": "ev_dy_7676925624883597174_013",
+          "exact_quote": "不管我以前奶香很薄碼",
+          "evidence_location": "0174.7s-0176.2s",
+          "source_type": "video_transcript",
+          "aspect": "味道",
+          "target": "奶茶",
+          "rule_review_status": "pass",
+          "human_review_status": "pending",
+          "title": "泰奶居然还有隐藏喝法…在泰奶冰沙里喝到人生珍珠！ #测评 #奶茶 #一起喝奶茶 #泰奶 #抖音美食创作人",
+          "source_url": "https://www.douyin.com/video/7676925624883597174"
+        },
+        {
+          "evidence_id": "ev_dy_7676925624883597174_014",
+          "exact_quote": "紅茶帶一點香草味",
+          "evidence_location": "0179.2s-0180.8s",
+          "source_type": "video_transcript",
+          "aspect": "味道",
+          "target": "奶茶",
+          "rule_review_status": "pass",
+          "human_review_status": "pending",
+          "title": "泰奶居然还有隐藏喝法…在泰奶冰沙里喝到人生珍珠！ #测评 #奶茶 #一起喝奶茶 #泰奶 #抖音美食创作人",
+          "source_url": "https://www.douyin.com/video/7676925624883597174"
+        },
+        {
+          "evidence_id": "ev_dy_7676925624883597174_015",
+          "exact_quote": "蓋的鹹香會慢慢的化進茶桶裡",
+          "evidence_location": "0180.8s-0182.9s",
+          "source_type": "video_transcript",
+          "aspect": "味道",
+          "target": "奶茶",
+          "rule_review_status": "pass",
+          "human_review_status": "pending",
+          "title": "泰奶居然还有隐藏喝法…在泰奶冰沙里喝到人生珍珠！ #测评 #奶茶 #一起喝奶茶 #泰奶 #抖音美食创作人",
+          "source_url": "https://www.douyin.com/video/7676925624883597174"
+        },
+        {
+          "evidence_id": "ev_dy_7676925624883597174_016",
+          "exact_quote": "更容易入口",
+          "evidence_location": "0186.6s-0187.2s",
+          "source_type": "video_transcript",
+          "aspect": "体验",
+          "target": "奶茶",
+          "rule_review_status": "pass",
+          "human_review_status": "pending",
+          "title": "泰奶居然还有隐藏喝法…在泰奶冰沙里喝到人生珍珠！ #测评 #奶茶 #一起喝奶茶 #泰奶 #抖音美食创作人",
+          "source_url": "https://www.douyin.com/video/7676925624883597174"
+        },
+        {
+          "evidence_id": "ev_dy_7676925624883597174_017",
+          "exact_quote": "大王志祺不裝那一碗太奶",
+          "evidence_location": "0190.2s-0192.0s",
+          "source_type": "video_transcript",
+          "aspect": "表达",
+          "target": "奶茶",
+          "rule_review_status": "pass",
+          "human_review_status": "pending",
+          "title": "泰奶居然还有隐藏喝法…在泰奶冰沙里喝到人生珍珠！ #测评 #奶茶 #一起喝奶茶 #泰奶 #抖音美食创作人",
+          "source_url": "https://www.douyin.com/video/7676925624883597174"
+        },
+        {
+          "evidence_id": "ev_dy_7676925624883597174_018",
+          "exact_quote": "有些太奶是還原來太過雞頭的味道",
+          "evidence_location": "0194.5s-0196.5s",
+          "source_type": "video_transcript",
+          "aspect": "体验",
+          "target": "奶茶",
+          "rule_review_status": "pass",
+          "human_review_status": "pending",
+          "title": "泰奶居然还有隐藏喝法…在泰奶冰沙里喝到人生珍珠！ #测评 #奶茶 #一起喝奶茶 #泰奶 #抖音美食创作人",
+          "source_url": "https://www.douyin.com/video/7676925624883597174"
+        }
+      ],
+      "candidates": [],
+      "pool_note": "该归档没有完整可见候选池，不能给出热门结论。"
+    }
+  ],
+  "prompt_contract": {
+    "scope": "taskbook_acceptance_fixture_only",
+    "warning": "仅用于规则契约回归，不能作为24篇真实公开内容金标准或真实模型准确率。",
+    "v0_correct": 4,
+    "v1_correct": 8,
+    "total": 8,
+    "cases": [
+      {
+        "content_id": "fixture_shrimp_expression",
+        "exact_quote": "虾究极 Q 弹",
+        "expected_useful": true,
+        "prompt_v0_prediction": true,
+        "prompt_v1_prediction": true,
+        "traceable": true,
+        "v1_reason": "任务书人工预期"
+      },
+      {
+        "content_id": "fixture_shrimp_expression",
+        "exact_quote": "每一口都能嚼到虾肉",
+        "expected_useful": true,
+        "prompt_v0_prediction": false,
+        "prompt_v1_prediction": true,
+        "traceable": true,
+        "v1_reason": "任务书人工预期"
+      },
+      {
+        "content_id": "fixture_shrimp_expression",
+        "exact_quote": "求地址",
+        "expected_useful": false,
+        "prompt_v0_prediction": false,
+        "prompt_v1_prediction": false,
+        "traceable": true,
+        "v1_reason": "任务书人工预期"
+      },
+      {
+        "content_id": "fixture_shrimp_expression",
+        "exact_quote": "好吃绝了",
+        "expected_useful": false,
+        "prompt_v0_prediction": true,
+        "prompt_v1_prediction": false,
+        "traceable": true,
+        "v1_reason": "任务书人工预期"
+      },
+      {
+        "content_id": "fixture_poke_expression",
+        "exact_quote": "拜见三文鱼波奇饭大王",
+        "expected_useful": true,
+        "prompt_v0_prediction": true,
+        "prompt_v1_prediction": true,
+        "traceable": true,
+        "v1_reason": "任务书人工预期"
+      },
+      {
+        "content_id": "fixture_poke_expression",
+        "exact_quote": "看起来不错",
+        "expected_useful": false,
+        "prompt_v0_prediction": true,
+        "prompt_v1_prediction": false,
+        "traceable": true,
+        "v1_reason": "任务书人工预期"
+      },
+      {
+        "content_id": "fixture_risk_expression",
+        "exact_quote": "这杯奶茶茶味清爽",
+        "expected_useful": true,
+        "prompt_v0_prediction": true,
+        "prompt_v1_prediction": true,
+        "traceable": true,
+        "v1_reason": "任务书人工预期"
+      },
+      {
+        "content_id": "fixture_risk_expression",
+        "exact_quote": "吃完瘦三斤",
+        "expected_useful": false,
+        "prompt_v0_prediction": true,
+        "prompt_v1_prediction": false,
+        "traceable": true,
+        "v1_reason": "任务书人工预期"
+      }
+    ]
+  }
+}

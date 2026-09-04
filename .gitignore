@@ -9,6 +9,7 @@ output/
 *_transcript.txt
 web_capture.*.log
 web/qa-*.png
+artifacts/public_demo_*.png
 
 # Python
 __pycache__/
@@ -18,6 +19,7 @@ venv/
 
 # Node.js 本地依赖
 node_modules/
+.vercel/
 
 # 本机配置与密钥
 .env
