@@ -1,0 +1,169 @@
+{
+  "gold_status": "insufficient_human_gold",
+  "gold_inventory": {
+    "total_real_cases": 5,
+    "approved_gold_cases": 0,
+    "approved_gold_sentences": 0,
+    "platform_counts": {
+      "xhs": 3,
+      "dy": 2
+    },
+    "categories": [
+      "奶茶",
+      "轻食"
+    ],
+    "secondary_annotation_cases": 0,
+    "secondary_coverage": null,
+    "requirements": {
+      "cases": 24,
+      "sentences": 60,
+      "xhs": 12,
+      "dy": 12,
+      "categories": 5,
+      "secondary_coverage": 0.2
+    }
+  },
+  "production_metrics": null,
+  "prompt_contract_ab": {
+    "dataset_scope": "taskbook_acceptance_fixture_only",
+    "is_real_public_gold": false,
+    "warning": "仅用于规则契约回归，不能作为24篇真实公开内容金标准或真实模型准确率。",
+    "run_config": {
+      "model": "none_contract_rules",
+      "temperature": null,
+      "input_truncation": null,
+      "prompt_versions": [
+        "prompt_v0_contract",
+        "prompt_v1_rules"
+      ]
+    },
+    "cases": [
+      {
+        "content_id": "fixture_shrimp_expression",
+        "exact_quote": "虾究极 Q 弹",
+        "expected_useful": true,
+        "prompt_v0_prediction": true,
+        "prompt_v1_prediction": true,
+        "traceable": true,
+        "v1_reason": "任务书人工预期"
+      },
+      {
+        "content_id": "fixture_shrimp_expression",
+        "exact_quote": "每一口都能嚼到虾肉",
+        "expected_useful": true,
+        "prompt_v0_prediction": false,
+        "prompt_v1_prediction": true,
+        "traceable": true,
+        "v1_reason": "任务书人工预期"
+      },
+      {
+        "content_id": "fixture_shrimp_expression",
+        "exact_quote": "求地址",
+        "expected_useful": false,
+        "prompt_v0_prediction": false,
+        "prompt_v1_prediction": false,
+        "traceable": true,
+        "v1_reason": "任务书人工预期"
+      },
+      {
+        "content_id": "fixture_shrimp_expression",
+        "exact_quote": "好吃绝了",
+        "expected_useful": false,
+        "prompt_v0_prediction": true,
+        "prompt_v1_prediction": false,
+        "traceable": true,
+        "v1_reason": "任务书人工预期"
+      },
+      {
+        "content_id": "fixture_poke_expression",
+        "exact_quote": "拜见三文鱼波奇饭大王",
+        "expected_useful": true,
+        "prompt_v0_prediction": true,
+        "prompt_v1_prediction": true,
+        "traceable": true,
+        "v1_reason": "任务书人工预期"
+      },
+      {
+        "content_id": "fixture_poke_expression",
+        "exact_quote": "看起来不错",
+        "expected_useful": false,
+        "prompt_v0_prediction": true,
+        "prompt_v1_prediction": false,
+        "traceable": true,
+        "v1_reason": "任务书人工预期"
+      },
+      {
+        "content_id": "fixture_risk_expression",
+        "exact_quote": "这杯奶茶茶味清爽",
+        "expected_useful": true,
+        "prompt_v0_prediction": true,
+        "prompt_v1_prediction": true,
+        "traceable": true,
+        "v1_reason": "任务书人工预期"
+      },
+      {
+        "content_id": "fixture_risk_expression",
+        "exact_quote": "吃完瘦三斤",
+        "expected_useful": false,
+        "prompt_v0_prediction": true,
+        "prompt_v1_prediction": false,
+        "traceable": true,
+        "v1_reason": "任务书人工预期"
+      }
+    ],
+    "prompt_v0": {
+      "accuracy": 0.5,
+      "expression_precision": 0.5,
+      "generic_noise_false_accept": 0.75,
+      "exact_quote_traceability": 1.0,
+      "accepted": 6,
+      "badcases": [
+        {
+          "content_id": "fixture_shrimp_expression",
+          "exact_quote": "每一口都能嚼到虾肉",
+          "expected_useful": true,
+          "prompt_v0_prediction": false,
+          "prompt_v1_prediction": true,
+          "traceable": true,
+          "v1_reason": "任务书人工预期"
+        },
+        {
+          "content_id": "fixture_shrimp_expression",
+          "exact_quote": "好吃绝了",
+          "expected_useful": false,
+          "prompt_v0_prediction": true,
+          "prompt_v1_prediction": false,
+          "traceable": true,
+          "v1_reason": "任务书人工预期"
+        },
+        {
+          "content_id": "fixture_poke_expression",
+          "exact_quote": "看起来不错",
+          "expected_useful": false,
+          "prompt_v0_prediction": true,
+          "prompt_v1_prediction": false,
+          "traceable": true,
+          "v1_reason": "任务书人工预期"
+        },
+        {
+          "content_id": "fixture_risk_expression",
+          "exact_quote": "吃完瘦三斤",
+          "expected_useful": false,
+          "prompt_v0_prediction": true,
+          "prompt_v1_prediction": false,
+          "traceable": true,
+          "v1_reason": "任务书人工预期"
+        }
+      ]
+    },
+    "prompt_v1": {
+      "accuracy": 1.0,
+      "expression_precision": 1.0,
+      "generic_noise_false_accept": 0.0,
+      "exact_quote_traceability": 1.0,
+      "accepted": 4,
+      "badcases": []
+    }
+  },
+  "manual_spot_check_10": "not_run_requires_human"
+}

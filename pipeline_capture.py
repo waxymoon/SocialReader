@@ -22,7 +22,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Any
-from urllib.parse import unquote, urljoin, urlparse
+from urllib.parse import parse_qsl, unquote, urlencode, urljoin, urlparse, urlsplit, urlunsplit
 from urllib.request import Request, urlopen
 
 from read_social import (
@@ -118,6 +118,114 @@ def clean_block(value: Any) -> str:
     return tidy(html.unescape(str(value or ""))).strip()
 
 
+def yaml_scalar(value: Any, *, quote_colons: bool = False) -> str:
+    """生成安全的 YAML 单行标量，不依赖第三方 yaml 库。"""
+    text = clean_inline(value, "")
+    needs_quotes = (
+        not text
+        or bool(re.search(r'["\']', text))
+        or (quote_colons and ":" in text)
+        or bool(re.search(r":\s|\s#", text))
+        or text[0] in "-?:,[]{}#&*!|>@`"
+        or text.lower() in {"null", "true", "false", "yes", "no", "on", "off"}
+    )
+    if not needs_quotes:
+        return text
+    escaped = text.replace("\\", "\\\\").replace('"', '\\"')
+    return f'"{escaped}"'
+
+
+TOPIC_PATTERN = re.compile(r"#([^#\s\[\]]+)\[话题\]#?")
+
+
+def extract_topics_and_clean_body(value: Any) -> tuple[str, list[str]]:
+    """提取小红书话题，并清理正文中的制表符和多余空行。"""
+    body = clean_block(value)
+    tags: list[str] = []
+    seen: set[str] = set()
+    for match in TOPIC_PATTERN.finditer(body):
+        tag = clean_inline(match.group(1), "")
+        if tag and tag not in seen:
+            seen.add(tag)
+            tags.append(tag)
+    body = TOPIC_PATTERN.sub("", body).replace("\t", "")
+    body = re.sub(r"\n{3,}", "\n\n", body).strip()
+    return body, tags
+
+
+def parse_interactions(value: Any) -> dict[str, int | None]:
+    """从“赞 / 藏 / 评 / 分享”文本中分别读取互动数。"""
+    text = clean_inline(value, "")
+    labels = {
+        "likes": r"赞",
+        "favorites": r"藏",
+        "comments": r"评",
+        "shares": r"分享",
+    }
+    result: dict[str, int | None] = {}
+    compact = r"(\d+(?:\.\d+)?\s*[万亿wk]?)"
+    for key, label in labels.items():
+        match = re.search(compact + r"\s*" + label, text, flags=re.IGNORECASE)
+        result[key] = parse_compact_count(match.group(1)) if match else None
+    return result
+
+
+COMMENT_TIME_PATTERN = re.compile(
+    r"^(?P<time>(?:今天|昨天|前天)(?:\s+\d{1,2}:\d{2})?"
+    r"|\d+\s*(?:秒|分钟|小时|天|周|个月|月|年)前(?:\s+\d{1,2}:\d{2})?"
+    r"|\d{1,2}-\d{1,2}(?:\s+\d{1,2}:\d{2})?"
+    r"|\d{4}-\d{1,2}-\d{1,2}(?:\s+\d{1,2}:\d{2})?)(?P<location>.*)$"
+)
+COMMENT_LIKE_PATTERN = re.compile(r"^\d+(?:\.\d+)?\s*[万亿wk]?$", re.IGNORECASE)
+
+
+def format_comment(value: Any) -> str:
+    """把不稳定的 <br> 评论片段尽量整理成一条可读 Markdown。"""
+    original = str(value or "").strip()
+    if not original:
+        return "- "
+    try:
+        parts = [part.strip() for part in re.split(r"<br\s*/?>|[\r\n]+", original) if part.strip()]
+        if not parts:
+            return f"- {original}"
+        nickname = parts.pop(0)
+        if not nickname:
+            return f"- {original}"
+
+        like_count = ""
+        if parts and COMMENT_LIKE_PATTERN.fullmatch(parts[-1]):
+            like_count = parts.pop()
+            if parts and "赞" in parts[-1]:
+                parts.pop()
+
+        time_place = ""
+        time_index = next(
+            (index for index in range(len(parts) - 1, -1, -1) if COMMENT_TIME_PATTERN.match(parts[index])),
+            None,
+        )
+        if time_index is not None:
+            raw_time_place = parts.pop(time_index)
+            match = COMMENT_TIME_PATTERN.match(raw_time_place)
+            if match:
+                time_text = match.group("time").strip()
+                location = match.group("location").strip()
+                time_place = f"{time_text}·{location}" if location else time_text
+        elif len(parts) >= 2:
+            time_place = parts.pop().strip()
+
+        content = "：".join(parts).strip()
+        line = f"- **{nickname}**"
+        if time_place:
+            line += f"（{time_place}）"
+        if content:
+            line += f"：{content}"
+        if like_count:
+            line += f" — 赞 {like_count}"
+        return line
+    except Exception:
+        return f"- {original}"
+
+
 def format_published(value: Any) -> str:
     if value in (None, ""):
         return ""
@@ -136,6 +244,17 @@ def normalize_url(url: str, base: str) -> str:
     return urljoin(base, html.unescape(url or ""))
 
 
+def public_source_url(url: str) -> str:
+    """保存可复现的内容定位 URL；小红书详情需要保留 xsec 签名参数。"""
+    parts = urlsplit(str(url or ""))
+    query = [
+        (key, value)
+        for key, value in parse_qsl(parts.query, keep_blank_values=True)
+        if key.lower() not in {"share_token", "sec_uid", "timestamp"}
+    ]
+    return urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(query), ""))
+
+
 def unique_links(items: list[tuple[str, str]], base: str, maximum: int) -> list[tuple[str, str]]:
     output: list[tuple[str, str]] = []
     seen: set[str] = set()
@@ -148,6 +267,133 @@ def unique_links(items: list[tuple[str, str]], base: str, maximum: int) -> list[
         if len(output) >= maximum:
             break
     return output
+
+
+def parse_compact_count(value: Any) -> int | None:
+    """把 1720、1.2万、3w、4.5k 等页面计数转换为整数。"""
+    text = clean_inline(value, "").lower().replace(",", "").replace("+", "")
+    match = re.search(r"(\d+(?:\.\d+)?)\s*([万亿wk]?)", text)
+    if not match:
+        return None
+    multiplier = {
+        "": 1,
+        "k": 1_000,
+        "w": 10_000,
+        "万": 10_000,
+        "亿": 100_000_000,
+    }[match.group(2)]
+    return int(float(match.group(1)) * multiplier)
+
+
+def child_count(element: Any, selectors: tuple[str, ...]) -> int | None:
+    """只从明确的计数元素读取数字，避免把日期或视频时长当成点赞。"""
+    for selector in selectors:
+        try:
+            for child in element.eles(selector, timeout=0.5):
+                count = parse_compact_count(child.text or "")
+                if count is not None:
+                    return count
+        except Exception:
+            continue
+    return None
+
+
+def card_link(card: Any, patterns: tuple[str, ...]) -> tuple[str, str] | None:
+    """从一张搜索卡片中取详情链接，并优先使用有文字的标题链接。"""
+    chosen_url = ""
+    chosen_title = ""
+    try:
+        anchors = card.eles("tag:a", timeout=1)
+    except Exception:
+        anchors = []
+    for anchor in anchors:
+        try:
+            href = str(anchor.attr("href") or "")
+            if not any(pattern in href for pattern in patterns):
+                continue
+            title = clean_inline(anchor.text or "", "")
+            if not chosen_url:
+                chosen_url = href
+            if title:
+                chosen_url = href
+                chosen_title = title
+                break
+        except Exception:
+            continue
+    if not chosen_url:
+        return None
+    if not chosen_title:
+        text = clean_block(card.text or "")
+        chosen_title = next((line.strip() for line in text.splitlines() if line.strip()), "")
+    return chosen_title[:100], chosen_url
+
+
+def collect_xhs_ranked_links(page: Any, maximum: int) -> list[tuple[str, str]]:
+    """读取小红书当前搜索页全部卡片，按卡片点赞数降序取前 N 条。"""
+    try:
+        cards = page.eles(".note-item", timeout=5)
+    except Exception:
+        return []
+    candidates: list[tuple[str, str, int | None, int]] = []
+    seen: set[str] = set()
+    for position, card in enumerate(cards):
+        item = card_link(card, ("/search_result/", "/explore/", "/discovery/"))
+        if not item:
+            continue
+        title, href = item
+        url = normalize_url(href, "https://www.xiaohongshu.com")
+        if url in seen:
+            continue
+        seen.add(url)
+        likes = child_count(card, (".count", ".like-wrapper"))
+        candidates.append((title, url, likes, position))
+    if not candidates:
+        return []
+    if any(item[2] is not None for item in candidates):
+        candidates.sort(key=lambda item: (item[2] is not None, item[2] or -1), reverse=True)
+        print(f"[点赞排序] 小红书：从当前页 {len(candidates)} 条候选中，按点赞数取前 {min(maximum, len(candidates))} 条")
+        for rank, (title, _url, likes, _position) in enumerate(candidates[:maximum], 1):
+            print(f"  {rank}. {likes if likes is not None else '未读取'} 赞 · {title[:50]}")
+    else:
+        print("[点赞排序] 小红书卡片未读取到点赞数，保留页面原顺序")
+    return [(title, url) for title, url, _likes, _position in candidates[:maximum]]
+
+
+DY_LIKE_SELECTORS = (
+    ".like-count",
+    "css:[class*='like-count']",
+    "css:[class*='likeCount']",
+    "css:[class*='digg']",
+    "css:[data-e2e*='like']",
+)
+
+
+def collect_dy_ranked_anchor_links(page: Any, maximum: int) -> list[tuple[str, str]]:
+    """抖音卡片有详情链接时，仅在所有点赞数都明确可读时排序。"""
+    try:
+        cards = page.eles(".search-result-card", timeout=5)
+    except Exception:
+        return []
+    candidates: list[tuple[str, str, int | None, int]] = []
+    seen: set[str] = set()
+    for position, card in enumerate(cards):
+        item = card_link(card, ("/video/",))
+        if not item:
+            continue
+        title, href = item
+        url = normalize_url(href, "https://www.douyin.com")
+        if url in seen:
+            continue
+        seen.add(url)
+        candidates.append((title, url, child_count(card, DY_LIKE_SELECTORS), position))
+    if not candidates:
+        return []
+    if all(item[2] is not None for item in candidates):
+        candidates.sort(key=lambda item: item[2] or 0, reverse=True)
+        print(f"[点赞排序] 抖音：从当前页 {len(candidates)} 条候选中，按点赞数取前 {min(maximum, len(candidates))} 条")
+    else:
+        print("[点赞排序] 抖音搜索页未稳定读取到点赞数，保留页面原顺序")
+    return [(title, url) for title, url, _likes, _position in candidates[:maximum]]
 
 
 def parse_json(raw: Any) -> dict[str, Any]:
@@ -725,22 +971,38 @@ def capture_dy(
 
 def format_markdown(capture: Capture, platform: str, url: str, error: str = "") -> str:
     captured_at = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S %z")
+    url = public_source_url(url)
+    title = clean_inline(capture.title, "采集失败记录")
+    body, tags = extract_topics_and_clean_body(capture.body)
+    interactions = parse_interactions(capture.interactions)
     lines = [
-        f"# {clean_inline(capture.title, '采集失败记录')}",
+        "---",
+        f"title: {yaml_scalar(title, quote_colons=True)}",
+        f"source: {platform}",
+        f"platform: {yaml_scalar(PLATFORM_LABEL[platform])}",
+        f"content_type: {yaml_scalar(clean_inline(capture.content_type))}",
+        f"url: {yaml_scalar(url)}",
+        f"author: {yaml_scalar(clean_inline(capture.author))}",
+        f"collected_at: {yaml_scalar(captured_at)}",
+        f"published_at: {yaml_scalar(clean_inline(capture.published_at))}",
+        f"likes: {interactions['likes'] if interactions['likes'] is not None else ''}",
+        f"favorites: {interactions['favorites'] if interactions['favorites'] is not None else ''}",
+        f"comments: {interactions['comments'] if interactions['comments'] is not None else ''}",
+        f"shares: {interactions['shares'] if interactions['shares'] is not None else ''}",
+    ]
+    if tags:
+        lines.append("tags:")
+        lines.extend(f"  - {yaml_scalar(tag)}" for tag in tags)
+    lines.extend([
+        "---",
         "",
-        f"- 平台：{PLATFORM_LABEL[platform]}",
-        f"- 内容类型：{clean_inline(capture.content_type)}",
-        f"- 链接：{url}",
-        f"- 采集时间：{captured_at}",
-        f"- 发布时间：{clean_inline(capture.published_at)}",
-        f"- 作者：{clean_inline(capture.author)}",
-        f"- 互动数：{clean_inline(capture.interactions)}",
+        f"# {title}",
         "",
         "## 正文",
         "",
-        clean_block(capture.body) or "（未提取到正文）",
+        body or "（未提取到正文）",
         "",
-    ]
+    ])
     if capture.images:
         lines.extend(["## 图片", ""])
         for index, image_path in enumerate(capture.images, start=1):
@@ -748,7 +1010,7 @@ def format_markdown(capture: Capture, platform: str, url: str, error: str = "") 
     lines.extend([f"## 评论（前 {MAX_COMMENTS} 条）", ""])
     if capture.comments:
         for comment in capture.comments[:MAX_COMMENTS]:
-            lines.extend([f"- {comment.replace(chr(10), '<br>')}", ""])
+            lines.extend([format_comment(comment), ""])
     else:
         lines.extend(["（未提取到评论或该内容暂无评论）", ""])
     if capture.transcript or capture.video_note:
@@ -794,13 +1056,13 @@ def write_summary(
         "",
     ]
     for title, url, path in successes:
-        lines.append(f"- [[{path.stem}|{clean_inline(title, path.stem)}]] · [原链接]({url})")
+        lines.append(f"- [[{path.stem}|{clean_inline(title, path.stem)}]] · [原链接]({public_source_url(url)})")
     if not successes:
         lines.append("- （本次无成功条目）")
     if failures:
         lines.extend(["", "### 失败记录", ""])
         for url, reason in failures:
-            lines.append(f"- [原链接]({url})：{clean_inline(reason)}")
+            lines.append(f"- [原链接]({public_source_url(url)})：{clean_inline(reason)}")
     with summary_path.open("a", encoding="utf-8", newline="\n") as handle:
         handle.write("\n".join(lines) + "\n")
     return summary_path
@@ -809,6 +1071,9 @@ def write_summary(
 def collect_search_links(page: Any, platform: str, keyword: str, maximum: int) -> list[tuple[str, str]]:
     if platform == "xhs":
         cmd_search_xhs(page, keyword)
+        ranked = collect_xhs_ranked_links(page, maximum)
+        if ranked:
+            return ranked
         # 搜索卡片的 /search_result/<id>?xsec_token=... 才能可靠进入详情；
         # read_social 的 /explore/ 链接仍用于兼容旧版页面。
         links = (
@@ -818,6 +1083,9 @@ def collect_search_links(page: Any, platform: str, keyword: str, maximum: int) -
         )
         return unique_links(links, "https://www.xiaohongshu.com", maximum)
     cmd_search_dy(page, keyword)
+    ranked = collect_dy_ranked_anchor_links(page, maximum)
+    if ranked:
+        return ranked
     links = extract_links(page, "/video/")
     normalized = unique_links(links, "https://www.douyin.com", maximum)
     if normalized:
@@ -830,10 +1098,22 @@ def collect_dy_card_links(page: Any, maximum: int) -> list[tuple[str, str]]:
     search_url = str(getattr(page, "url", "") or "")
     output: list[tuple[str, str]] = []
     seen_ids: set[str] = set()
-    index = 0
-    while len(output) < maximum:
+    try:
+        initial_cards = page.eles(".search-result-card", timeout=5)
+    except Exception:
+        initial_cards = []
+    card_order = list(range(len(initial_cards)))
+    likes = [child_count(card, DY_LIKE_SELECTORS) for card in initial_cards]
+    if card_order and all(value is not None for value in likes):
+        card_order.sort(key=lambda index: likes[index] or 0, reverse=True)
+        print(f"[点赞排序] 抖音：从当前页 {len(card_order)} 条候选中，按点赞数尝试前 {min(maximum, len(card_order))} 条")
+    elif card_order:
+        print("[点赞排序] 抖音搜索页未稳定读取到点赞数，保留页面原顺序")
+    for attempt, index in enumerate(card_order):
+        if len(output) >= maximum:
+            break
         try:
-            if index:
+            if attempt:
                 page.get(search_url)
                 time.sleep(4)
             cards = page.eles(".search-result-card", timeout=5)
@@ -847,18 +1127,15 @@ def collect_dy_card_links(page: Any, maximum: int) -> list[tuple[str, str]]:
             modal = re.search(r"[?&]modal_id=(\d+)", detail_url)
             if not modal:
                 print(f"[链接兼容] 第 {index + 1} 张卡片点击后未出现 modal_id，跳过")
-                index += 1
                 continue
             if modal.group(1) in seen_ids:
                 print(f"[链接兼容] 卡片 {index + 1} 与已有内容重复，跳过")
-                index += 1
                 continue
             seen_ids.add(modal.group(1))
             output.append((title[:100], f"https://www.douyin.com/video/{modal.group(1)}"))
             print(f"[链接兼容] 卡片 {index + 1} → modal_id={modal.group(1)}")
         except Exception as exc:
             print(f"[链接兼容] 第 {index + 1} 张卡片读取失败：{exc}")
-        index += 1
     return output
 
 
@@ -929,7 +1206,7 @@ def main() -> int:
         current_sequence = sequence + offset
         filename = f"{date_token}_{platform_label}_{keyword_file}_{current_sequence:02d}.md"
         md_path = output_dir / filename
-        print(f"\n[{offset + 1}/{total}] {url}")
+        print(f"\n[{offset + 1}/{total}] {public_source_url(url)}")
         try:
             if args.platform == "xhs":
                 video_name = f"{date_token}_小红书_{keyword_file}_{current_sequence:02d}.mp4"

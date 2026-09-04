@@ -7,6 +7,7 @@ models/
 output/
 *.mp4
 *_transcript.txt
+web_capture.*.log
 web/qa-*.png
 
 # Python
@@ -15,6 +16,9 @@ __pycache__/
 .venv/
 venv/
 
+# Node.js 本地依赖
+node_modules/
+
 # 本机配置与密钥
 .env
 .env.*
@@ -22,6 +26,7 @@ config.json
 
 # 开发期内部脚本和任务书
 _*.py
+!_test_format.py
 TASK_*.md
 
 # 编辑器 / 系统

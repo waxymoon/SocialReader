@@ -1,0 +1,8 @@
+{
+  "iterations": 100,
+  "sample_size": 8,
+  "system_median": 0.673077,
+  "random_median": 0.5,
+  "lift": 0.173077,
+  "status": "above_baseline"
+}

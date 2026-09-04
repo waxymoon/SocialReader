@@ -1,0 +1,13 @@
+{
+  "outputSlides": [
+    {"outputSlide":1,"sourceSlide":1,"narrativeRole":"cover","reuseMode":"same-builder","editTargets":[]},
+    {"outputSlide":2,"sourceSlide":2,"narrativeRole":"what the product does","reuseMode":"same-builder","editTargets":[{"sourceElementId":"sh/9072xkry","action":"rewrite"}]},
+    {"outputSlide":3,"sourceSlide":3,"narrativeRole":"optimization steps","reuseMode":"same-builder","editTargets":[{"sourceElementId":"sh/cza94vmx","action":"rewrite"}]},
+    {"outputSlide":4,"sourceSlide":4,"narrativeRole":"actual prompt comparison","reuseMode":"same-builder","editTargets":[{"sourceElementId":"sh/1cj2d8b6","action":"rewrite"}]},
+    {"outputSlide":5,"sourceSlide":5,"narrativeRole":"eight-case evidence table","reuseMode":"same-builder","editTargets":[{"sourceElementId":"sh/dgbulwnm","action":"rewrite"}]},
+    {"outputSlide":6,"sourceSlide":6,"narrativeRole":"real run screenshot and numbers","reuseMode":"same-builder","editTargets":[{"sourceElementId":"sh/yhg7epsj","action":"rewrite"}]},
+    {"outputSlide":7,"sourceSlide":7,"narrativeRole":"traceable evidence and links","reuseMode":"same-builder","editTargets":[{"sourceElementId":"sh/cb2tkvap","action":"rewrite"}]},
+    {"outputSlide":8,"sourceSlide":8,"narrativeRole":"limits and next step","reuseMode":"same-builder","editTargets":[]}
+  ],
+  "omittedSourceSlides": []
+}

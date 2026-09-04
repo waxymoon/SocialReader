@@ -1,0 +1,7 @@
+Slides 1 and 8 preserve the existing narrative and visual structure.
+Slides 2 and 3 are simplified to reduce explanation burden.
+Slide 4 replaces conceptual examples with verbatim prompt excerpts and exact source filenames.
+Slide 5 replaces abstract evaluation cards with all eight fixed test rows and explicit 4/8 vs 8/8 totals.
+Slide 6 replaces detached metric cards with the actual current-run UI screenshot and plain-language definitions.
+Slide 7 adds the real knowledge-card/source-link screenshot and the real evidence-review screenshot.
+All additions are bounded to the original content regions and retain the source deck's typography and color system.

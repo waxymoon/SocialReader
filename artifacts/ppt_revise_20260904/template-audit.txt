@@ -1,0 +1,6 @@
+Source deck: D:\SocialReader\deliverables\AI美食社媒情报Agent_笔试汇报_20260904.pptx
+Slides inspected: 8/8 through artifact-tool import, PNG render, layout export, and inspect NDJSON.
+Visual system retained: warm off-white canvas, dark ink, rust accent, teal evidence accent, thin rules, Microsoft YaHei typography, 1280x720 canvas.
+Reusable patterns: split cover, two-column comparison, horizontal process, large evidence table, screenshot plus annotation, closing split.
+No reusable source master placeholders are present beyond a basic title-slide layout; content is slide-local and generated from the existing editable builder.
+Revision contract: preserve slide count, cover and closing visual language; replace abstract P4-P6 content with actual prompt excerpts, full 8-row result evidence, and real UI screenshots.

@@ -1,0 +1,17 @@
+Revised deck evidence sources:
+- D:\SocialReader\extract_capture.py (V0 prompt source)
+- D:\SocialReader\domains\food_v1\prompts\extract_food_v1.txt
+- D:\SocialReader\domains\food_v1\prompts\extract_expression_v1.txt
+- D:\SocialReader\domains\food_v1\prompts\review_evidence_v1.txt
+- D:\SocialReader\domains\food_v1\prompts\generate_reason_v1.txt
+- D:\SocialReader\domains\food_v1\evals\stage1_acceptance_cases.jsonl
+- D:\SocialReader\deliverables\pre_capture_demo\eval_report.json
+- D:\SocialReader\deliverables\08_实施验收报告.md
+- D:\SocialReader\artifacts\ppt_overview_20260904.png
+- D:\SocialReader\artifacts\ppt_cards_links_20260904.png
+- D:\SocialReader\artifacts\ppt_evidence_20260904.png
+
+Data policy:
+- V0 4/8 and V1 8/8 are fixed-rule boundary-example matches, shown row by row.
+- Human gold remains 0/24; no production accuracy is claimed.
+- Current-run numbers are scoped to the verified local run only.

@@ -1,0 +1,12 @@
+{
+  "prompt_v0": {
+    "purpose": "现有通用爆款结构萃取",
+    "source": "extract_capture.py build_prompt",
+    "status": "baseline"
+  },
+  "prompt_v1": {
+    "purpose": "食品知识、活人感候选、独立证据审核和推荐理由分层",
+    "files": ["extract_food_v1.txt", "extract_expression_v1.txt", "review_evidence_v1.txt", "generate_reason_v1.txt"],
+    "status": "active"
+  }
+}

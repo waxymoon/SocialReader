@@ -21,6 +21,16 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qs, urlparse
 
+from domain_pipeline import (
+    DEFAULT_OUTPUT_ROOT as FOOD_OUTPUT_ROOT,
+    load_analysis_items,
+    load_config as load_food_config,
+    plan_queries,
+    run_analysis,
+    update_review,
+)
+from food_metrics import read_jsonl
+
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -33,6 +43,7 @@ PIPELINE = ROOT / "pipeline_capture.py"
 PYTHON = Path(sys.executable)
 OUTPUT_ROOT = Path(os.environ.get("SOCIALREADER_OUTPUT_ROOT", r"D:\ObsidianVault\采集\内容流水线")).expanduser()
 START_BROWSER = ROOT / "start_browser.bat"
+FOOD_SAMPLE_ROOT = Path(r"D:\ObsidianVault\采集\内容流水线\三文鱼波奇饭")
 HOST = "127.0.0.1"
 DEFAULT_PORT = 8787
 DEBUG_PORT = 9333
@@ -81,6 +92,39 @@ def safe_output_file(relative: str) -> Path:
     if candidate.suffix.lower() != ".md" or not candidate.is_file():
         raise FileNotFoundError("Markdown 文件不存在")
     return candidate
+
+
+def latest_food_run() -> Path | None:
+    pointer = FOOD_OUTPUT_ROOT / "latest_run.txt"
+    if not pointer.is_file():
+        return None
+    path = Path(pointer.read_text(encoding="utf-8", errors="replace").strip()).resolve()
+    try:
+        path.relative_to(FOOD_OUTPUT_ROOT.resolve())
+    except ValueError:
+        return None
+    return path if path.is_dir() else None
+
+
+def food_run_payload(output_dir: Path | None = None) -> dict[str, Any]:
+    run = output_dir or latest_food_run()
+    if not run:
+        return {"available": False, "cards": [], "expressions": [], "reasons": [], "meta": {}}
+    meta_path = run / "run_meta.json"
+    meta = json.loads(meta_path.read_text(encoding="utf-8")) if meta_path.is_file() else {}
+    baseline_path = run / "random_baseline.json"
+    return {
+        "available": True,
+        "run_dir": str(run),
+        "cards": read_jsonl(run / "food_cards.jsonl"),
+        "expressions": read_jsonl(run / "vivid_expressions.jsonl"),
+        "reasons": read_jsonl(run / "recommendation_reasons.jsonl"),
+        "reviews": read_jsonl(run / "review_results.jsonl"),
+        "candidate_pool": read_jsonl(run / "candidate_pool_scored.jsonl"),
+        "selected_candidates": read_jsonl(run / "selected_candidates.jsonl"),
+        "random_baseline": json.loads(baseline_path.read_text(encoding="utf-8")) if baseline_path.is_file() else {},
+        "meta": meta,
+    }
 
 
 class JobManager:
@@ -346,11 +390,21 @@ class SocialReaderHandler(BaseHTTPRequestHandler):
         if parsed.path == "/":
             self._serve_file(WEB_ROOT / "index.html")
             return
+        if parsed.path == "/food":
+            self._serve_file(WEB_ROOT / "food.html")
+            return
         if parsed.path == "/api/status":
             self._json({"ok": True, "browser_ready": debug_browser_ready(), "job": JOBS.snapshot()})
             return
         if parsed.path == "/api/files":
             self._json({"ok": True, "files": recent_markdown()})
+            return
+        if parsed.path == "/api/food/config":
+            manifest, keywords = load_food_config()
+            self._json({"ok": True, "manifest": manifest, "keywords": keywords, "real_sample_count": len(list(FOOD_SAMPLE_ROOT.glob("*.md"))) - int((FOOD_SAMPLE_ROOT / "_汇总.md").exists())})
+            return
+        if parsed.path == "/api/food/latest":
+            self._json({"ok": True, **food_run_payload()})
             return
         if parsed.path == "/api/file":
             relative = parse_qs(parsed.query).get("relative", [""])[0]
@@ -376,6 +430,32 @@ class SocialReaderHandler(BaseHTTPRequestHandler):
                     str(payload.get("model", "small")),
                 )
                 self._json({"ok": True, "job": job})
+                return
+            if self.path == "/api/food/plan":
+                seed = str(payload.get("seed_category", ""))
+                existing = payload.get("existing_queries", [])
+                if not isinstance(existing, list):
+                    raise ValueError("existing_queries 必须是数组")
+                self._json({"ok": True, "queries": plan_queries(seed, existing, 12)})
+                return
+            if self.path in {"/api/food/analyze-local", "/api/food/retry"}:
+                include_fixtures = bool(payload.get("include_acceptance_fixtures", True))
+                keyword = re.sub(r'[<>:"/\\|?*\x00-\x1f]', "_", str(payload.get("input_keyword", "")).strip()).strip(" .")
+                input_root = OUTPUT_ROOT / keyword if keyword else FOOD_SAMPLE_ROOT
+                if not input_root.is_dir():
+                    raise RuntimeError(f"本地采集目录不存在：{keyword or FOOD_SAMPLE_ROOT.name}")
+                items = load_analysis_items(input_root, include_fixtures=include_fixtures, limit=5)
+                if not items:
+                    raise RuntimeError("没有可分析的本地美食样本")
+                output_dir = run_analysis(items)
+                self._json({"ok": True, "message": f"food_v1 已分析 {len(items)} 条输入", **food_run_payload(output_dir)})
+                return
+            if self.path == "/api/food/review":
+                output_dir = latest_food_run()
+                if not output_dir:
+                    raise RuntimeError("还没有 food_v1 运行结果")
+                updated = update_review(output_dir, str(payload.get("evidence_id", "")), str(payload.get("status", "")), str(payload.get("reason", "")))
+                self._json({"ok": True, "updated": updated, **food_run_payload(output_dir)})
                 return
             if self.path == "/api/confirm-login":
                 self._json({"ok": True, "job": JOBS.confirm_login()})

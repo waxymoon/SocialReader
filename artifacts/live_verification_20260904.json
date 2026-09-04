@@ -1,0 +1,48 @@
+{
+  "verified_at": "2026-09-04T02:15:06+08:00",
+  "scope": "fresh_low_frequency_manual_verification",
+  "xhs": {
+    "query": "三文鱼波奇饭",
+    "requested": 3,
+    "success": 3,
+    "failed": 0,
+    "output_dir": "D:\\ObsidianVault\\采集\\内容流水线\\三文鱼波奇饭",
+    "transcript_success": 2,
+    "transcript_fallback": 1,
+    "replayable_xsec_links": 3,
+    "status": "verified",
+    "visible_candidate_pool": {
+      "query": "三文鱼波奇饭",
+      "visible_records": 27,
+      "replayable_xsec_links": 27,
+      "selected_for_detail": 8,
+      "metric_coverage": 0.25,
+      "system_median": 0.673077,
+      "random_baseline_median": 0.5,
+      "lift": 0.173077,
+      "strong_hotness_claim_allowed": false
+    }
+  },
+  "dy": {
+    "query": "奶茶新品",
+    "requested": 2,
+    "success": 2,
+    "source_noise_badcases": 0,
+    "failed": 0,
+    "output_dir": "D:\\ObsidianVault\\采集\\内容流水线\\奶茶新品",
+    "transcript_success": 2,
+    "status": "verified",
+    "ranking_note": "搜索页点赞字段无法稳定读取，按页面原顺序进入详情"
+  },
+  "fallback": {
+    "type": "fresh_pre_captured_local_data",
+    "latest_run_pointer": "D:\\ObsidianVault\\采集\\美食情报\\latest_run.txt",
+    "status": "available"
+  },
+  "claims": {
+    "platform_wide_hotness": false,
+    "official_ranking_reproduced": false,
+    "real_business_conversion": false,
+    "production_prompt_accuracy": false
+  }
+}

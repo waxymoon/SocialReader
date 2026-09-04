@@ -1,0 +1,24 @@
+{
+  "domain": "food_v1",
+  "name": "AI 美食社媒情报",
+  "schema_version": "food_v1",
+  "prompt_version": "prompt_v1",
+  "newness_rule_version": "newness_rule_v1",
+  "hotness_rule_version": "hotness_rule_v1",
+  "expression_rule_version": "expression_rule_v1",
+  "date_window_days": 45,
+  "trend_window_days": 14,
+  "minimum_hot_pool_size": 10,
+  "minimum_metric_coverage": 0.5,
+  "relative_hot_percentile": 0.8,
+  "rising_weights": {
+    "engagement": 0.7,
+    "recency": 0.3
+  },
+  "detail_quotas": {
+    "high_engagement": 3,
+    "recent": 3,
+    "comment_value": 2
+  },
+  "external_claim_scope": "同平台、同关键词、同一次可见候选池中的相对热门内容"
+}

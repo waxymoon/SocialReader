@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SocialReader · 美食情报</title>
+  <style>
+    :root { --bg:#f7f4ee; --surface:#fffdf9; --ink:#202725; --muted:#6d7671; --line:#ddd7cc; --accent:#b34c32; --green:#2e7554; --amber:#9a681a; --danger:#9d332a; --shadow:0 16px 45px rgba(61,48,36,.08); }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:linear-gradient(135deg,#f7f4ee,#f2ede3); font-family:"Microsoft YaHei UI","PingFang SC",sans-serif; }
+    button,input,select { font:inherit; }
+    a { color:var(--accent); }
+    .shell { width:min(1240px,calc(100% - 32px)); margin:auto; padding:24px 0 56px; }
+    header { display:flex; justify-content:space-between; gap:16px; align-items:center; }
+    .brand { display:flex; gap:12px; align-items:center; }
+    .mark { width:42px; height:42px; display:grid; place-items:center; color:white; background:var(--accent); font-weight:800; }
+    .brand small { display:block; color:var(--muted); margin-top:2px; }
+    .back { color:var(--ink); text-decoration:none; border:1px solid var(--line); padding:9px 13px; background:var(--surface); }
+    .hero { margin:28px 0 20px; display:flex; justify-content:space-between; gap:20px; align-items:end; }
+    .hero h1 { margin:0 0 9px; font-size:clamp(28px,4vw,46px); letter-spacing:-.04em; }
+    .hero p { max-width:800px; margin:0; line-height:1.75; color:var(--muted); }
+    .scope { max-width:360px; padding:12px 14px; color:#744219; background:#fff3da; border-left:4px solid #d88f2d; font-size:13px; line-height:1.6; }
+    .card { background:var(--surface); border:1px solid var(--line); box-shadow:var(--shadow); }
+    .setup { display:grid; grid-template-columns:1.05fr .95fr; gap:18px; }
+    .panel { padding:20px; }
+    h2,h3 { margin:0; }
+    .panel-head { display:flex; justify-content:space-between; align-items:start; gap:10px; margin-bottom:16px; }
+    .panel-head p { margin:5px 0 0; color:var(--muted); font-size:13px; }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    label span { display:block; margin-bottom:6px; font-size:13px; font-weight:700; }
+    input,select { width:100%; min-height:42px; border:1px solid var(--line); background:white; padding:9px 10px; color:var(--ink); }
+    .checks { display:flex; gap:14px; align-items:center; min-height:42px; }
+    .checks label { display:flex; gap:6px; align-items:center; font-size:13px; }
+    .checks input { width:auto; min-height:auto; }
+    .actions { display:flex; flex-wrap:wrap; gap:9px; margin-top:14px; }
+    .btn { border:1px solid var(--line); background:white; padding:9px 13px; cursor:pointer; font-weight:700; }
+    .primary { color:white; border-color:var(--accent); background:var(--accent); }
+    .btn:disabled { opacity:.5; cursor:not-allowed; }
+    .query-list { display:grid; gap:8px; max-height:280px; overflow:auto; }
+    .query { display:flex; gap:8px; align-items:start; padding:10px; background:#f8f5ef; border:1px solid #ebe4d9; }
+    .query input { width:auto; min-height:auto; margin-top:3px; }
+    .query b { font-size:14px; }
+    .query small { display:block; margin-top:3px; color:var(--muted); }
+    .status { margin:18px 0; padding:16px 18px; display:grid; grid-template-columns:repeat(6,1fr); gap:10px; }
+    .metric { padding:10px; background:#f8f5ef; }
+    .metric strong { display:block; font-size:20px; }
+    .metric span { color:var(--muted); font-size:12px; }
+    .status-note { grid-column:1/-1; color:var(--muted); font-size:13px; }
+    .tabs { display:flex; overflow:auto; border-bottom:1px solid var(--line); }
+    .tab { border:0; border-right:1px solid var(--line); background:#f6f1e8; padding:12px 16px; cursor:pointer; }
+    .tab.active { background:var(--surface); color:var(--accent); font-weight:800; }
+    .results { padding:18px; }
+    .result-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .item { border:1px solid var(--line); padding:14px; background:white; }
+    .meta { display:flex; gap:7px; flex-wrap:wrap; margin:8px 0; }
+    .chip { padding:3px 7px; background:#eeeae2; font-size:12px; }
+    .chip.real { color:white; background:var(--green); }
+    .chip.fixture { color:#6c4712; background:#fae8bc; }
+    .chip.fail { color:white; background:var(--danger); }
+    .quote { margin:10px 0; padding:10px 12px; border-left:3px solid var(--accent); background:#faf7f2; line-height:1.6; }
+    .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .row .btn { padding:6px 9px; font-size:12px; }
+    .empty { padding:30px; text-align:center; color:var(--muted); }
+    .error { color:var(--danger); }
+    @media(max-width:900px){ .setup,.result-grid{grid-template-columns:1fr}.hero{display:block}.scope{margin-top:14px}.status{grid-template-columns:repeat(3,1fr)} }
+    @media(max-width:560px){ .grid{grid-template-columns:1fr}.status{grid-template-columns:repeat(2,1fr)} }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header><div class="brand"><div class="mark">SR</div><div><b>SocialReader</b><small>通用采集底座 · food_v1</small></div></div><a class="back" href="/">← 通用采集</a></header>
+    <section class="hero"><div><h1>AI 美食社媒情报</h1><p>从已授权的公开内容中整理新品证据、品类属性与可回溯的用户原句。规则抽取、人工审核和推荐理由分开保存。</p></div><div class="scope">“热门”仅指同平台、同关键词、同一次可见候选池中的相对热门；不代表平台全站热榜。</div></section>
+
+    <section class="setup">
+      <div class="card panel">
+        <div class="panel-head"><div><h2>任务设置</h2><p>先预览搜索词，勾选后才允许进入采集。</p></div><span id="version" class="chip">food_v1</span></div>
+        <div class="grid">
+          <label><span>任务模式</span><select id="taskMode"><option value="food" selected>美食情报</option><option value="general">通用采集（返回原页）</option></select></label>
+          <label><span>种子品类</span><input id="seed" value="三文鱼波奇饭" maxlength="40"></label>
+          <label><span>平台多选</span><div class="checks"><label><input type="checkbox" checked value="xhs">小红书</label><label><input type="checkbox" value="dy">抖音</label></div></label>
+          <label><span>时间窗口（天）</span><input id="dateWindow" type="number" min="1" max="365" value="45"></label>
+          <label><span>每词候选池数量</span><input id="poolSize" type="number" min="10" max="100" value="20"></label>
+          <label><span>数据模式</span><select id="dataMode"><option value="pre" selected>预采数据演示</option><option value="live">实时采集（阶段 4）</option></select></label>
+          <label><span>当前处理方式</span><select id="prompt" disabled><option value="prompt_v1">food_v1 本地规则（未调用模型）</option></select></label>
+        </div>
+        <div class="actions"><button id="planBtn" class="btn" type="button">预览关键词</button><button id="startBtn" class="btn primary" type="button">开始</button><button id="confirmBtn" class="btn" type="button" disabled>我已登录，继续</button><button id="stopBtn" class="btn" type="button" disabled>停止</button><button id="retryBtn" class="btn" type="button">重试失败</button></div>
+      </div>
+      <div class="card panel">
+        <div class="panel-head"><div><h2>关键词扩展预览</h2><p>规则词库为主；切换勾选不会改变下方最近运行指标，点击“开始”后才更新。</p></div></div>
+        <div id="queries" class="query-list"><div class="empty">点击“预览关键词”生成候选。</div></div>
+      </div>
+    </section>
+
+    <section class="card status">
+      <div class="metric"><strong id="currentQuery">—</strong><span>最近运行关键词</span></div>
+      <div class="metric"><strong id="poolCount">—</strong><span>实际候选池</span></div>
+      <div class="metric"><strong id="detailCount">0</strong><span>真实详情输入</span></div>
+      <div class="metric"><strong id="successCount">0</strong><span>有效真实内容</span></div>
+      <div class="metric"><strong id="failedCount">0</strong><span>真实采集坏例</span></div>
+      <div class="metric"><strong id="pendingCount">0</strong><span>真实待审核</span></div>
+      <div id="statusNote" class="status-note">等待加载最近一次 food_v1 结果。</div>
+    </section>
+
+    <section class="card">
+      <div class="tabs"><button class="tab active" data-tab="trends">新品与趋势候选</button><button class="tab" data-tab="cards">品类知识卡</button><button class="tab" data-tab="expressions">活人感表达库</button><button class="tab" data-tab="reasons">推荐理由与证据</button></div>
+      <div id="results" class="results"><div class="empty">正在读取结果…</div></div>
+    </section>
+  </main>
+  <script>
+    const $ = id => document.getElementById(id);
+    let state = {cards:[], expressions:[], reasons:[], candidate_pool:[], selected_candidates:[], random_baseline:{}, meta:{}};
+    let activeTab = 'trends', liveTimer = null, liveKeyword = '';
+    async function api(path, options={}) { const response=await fetch(path,{headers:{'Content-Type':'application/json'},...options}); const data=await response.json().catch(()=>({ok:false,error:'返回内容不是JSON'})); if(!response.ok||!data.ok) throw new Error(data.error||`请求失败 ${response.status}`); return data; }
+    function esc(value){ return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
+    function sourceChip(kind){ return kind==='real_local_capture'?'<span class="chip real">实时采集归档</span>':'<span class="chip fixture">任务书验收夹具</span>'; }
+    function link(card){ return card.source_url?.startsWith('http')?`<a href="${esc(card.source_url)}" target="_blank" rel="noreferrer">原链接</a>`:'<span class="chip">夹具无外链</span>'; }
+    function update(data){ state=data; const cards=data.cards||[], expr=data.expressions||[], pool=data.candidate_pool||[], realCards=cards.filter(c=>c.source_kind==='real_local_capture'), realIds=new Set(realCards.map(c=>c.content_id)), runQueries=[...new Set([...pool.map(c=>c.query),...realCards.map(c=>c.query)].filter(Boolean))]; $('version').textContent=`food_v1 · ${realCards.length} 条当前真实样本`; $('currentQuery').textContent=runQueries.join(' / ')||'—'; $('poolCount').textContent=pool.length||'—'; $('detailCount').textContent=realCards.length; $('successCount').textContent=realCards.filter(c=>!(c.errors||[]).length).length; $('failedCount').textContent=realCards.filter(c=>(c.errors||[]).length).length; $('pendingCount').textContent=expr.filter(e=>realIds.has(e.content_id)&&e.human_review_status==='pending').length; const baseline=data.random_baseline||{}; $('statusNote').textContent=data.available?`运行 ${data.meta?.run_id||''} · 模型 ${data.meta?.model||'未记录'} · 随机基线 ${baseline.status||'未运行'} · 以上指标均来自该次运行`:'尚无运行结果'; render(); }
+    function render(){ const cards=state.cards||[], expr=state.expressions||[], reasons=state.reasons||[]; let html='';
+      if(activeTab==='trends') { const selected=new Map((state.selected_candidates||[]).map(x=>[x.content_id,x.selection_reasons||[]])); const pool=state.candidate_pool||[]; const baseline=state.random_baseline||{}; html=`<article class="item" style="grid-column:1/-1"><h3>候选池证据</h3><p>完整候选 ${pool.length} 条；入选 ${(state.selected_candidates||[]).length} 条；系统中位分位 ${baseline.system_median??'—'}，固定随机基线中位数 ${baseline.random_median??'—'}，差值 ${baseline.lift??'—'}。此处为确定性测试夹具，不是实时平台热榜。</p></article>`+pool.map(c=>`<article class="item"><h3>#${esc(c.rank_on_page)} ${esc(c.title)}</h3><div class="meta">${sourceChip(c.source_kind)}<span class="chip">${esc(c.platform)}</span><span class="chip">${esc(c.hotness_label)}</span><span class="chip">完整度 ${Math.round((c.metric_coverage||0)*100)}%</span>${c.duplicate_of?'<span class="chip fail">精确重复</span>':''}</div><p>点赞 ${esc(c.likes??'缺失')} · 收藏 ${esc(c.favorites??'缺失')} · 评论 ${esc(c.comments??'缺失')} · 分享 ${esc(c.shares??'缺失')}</p><p>互动分位：${esc(c.engagement_percentile??'不足')} · 入选原因：${esc((selected.get(c.content_id)||[]).join('、')||'未入选')}</p></article>`).join(''); if(!pool.length) html=cards.map(c=>`<article class="item"><h3>${esc(c.title)}</h3><div class="meta">${sourceChip(c.source_kind)}<span class="chip">${esc(c.platform)}</span><span class="chip">${esc(c.published_at||'日期缺失')}</span><span class="chip ${c.novelty?.label==='confirmed_new'?'real':''}">${esc(c.novelty?.label)}</span><span class="chip">${esc(c.hotness?.label)}</span></div><p>搜索词：${esc(c.query||'—')} · 指标完整度：${Math.round((c.metric_coverage||0)*100)}%</p><p>${esc(c.hotness?.scope_note||'单篇输入不足以判断热门')}</p>${link(c)}</article>`).join(''); }
+      if(activeTab==='cards') html=cards.map(c=>`<article class="item"><h3>${esc(c.title)}</h3><div class="meta">${sourceChip(c.source_kind)}<span class="chip">${esc(c.prompt_version)}</span><span class="chip">${esc(c.rule_versions?.expression||'expression_rule_v1')}</span></div>${(c.food_items||[]).map(f=>`<p><b>${esc(f.food_name)}</b> · ${esc(f.category)}<br>食材：${esc((f.ingredients||[]).join('、')||'无证据')}<br>味道：${esc((f.flavors||[]).join('、')||'无证据')} · 口感：${esc((f.textures||[]).join('、')||'无证据')}</p>`).join('')||'<p>未抽到可确认食品实体。</p>'}${link(c)}</article>`).join('');
+      if(activeTab==='expressions') html=expr.map(e=>`<article class="item"><div class="meta"><span class="chip">${esc(e.source_type)}</span><span class="chip">${esc(e.evidence_location)}</span><span class="chip ${e.rule_review_status==='fail'?'fail':'real'}">规则 ${esc(e.rule_review_status)}</span><span class="chip">人工 ${esc(e.human_review_status)}</span></div><div class="quote">“${esc(e.exact_quote)}”</div><p>对象：${esc(e.target||'未识别')} · 维度：${esc(e.aspect)} · 原因：${esc(e.review_reason)}</p><div class="row"><button class="btn" data-review="approved" data-id="${esc(e.evidence_id)}">人工通过</button><button class="btn" data-review="rejected" data-id="${esc(e.evidence_id)}">人工驳回</button><button class="btn" data-review="pending" data-id="${esc(e.evidence_id)}">待确认</button></div></article>`).join('');
+      if(activeTab==='reasons') html=reasons.map(r=>`<article class="item"><div class="quote">${esc(r.reason)}</div><p>证据：${esc((r.evidence_ids||[]).join('、'))}</p><div class="meta"><span class="chip">${esc(r.generation_source)}</span><span class="chip">${esc(r.prompt_version)}</span></div></article>`).join('');
+      $('results').innerHTML=html||'<div class="empty">当前页签暂无结果。</div>'; document.querySelectorAll('[data-review]').forEach(btn=>btn.onclick=()=>review(btn.dataset.id,btn.dataset.review)); }
+    async function load(){ try{ update(await api('/api/food/latest')); }catch(error){ $('statusNote').textContent=error.message; } }
+    async function plan(){ try{ const data=await api('/api/food/plan',{method:'POST',body:JSON.stringify({seed_category:$('seed').value,existing_queries:[]})}); $('queries').innerHTML=data.queries.map((q,i)=>`<label class="query"><input type="checkbox" checked value="${esc(q.query)}"><span><b>${esc(q.query)}</b><small>${esc(q.reason)} · 风险：${esc(q.risk)}</small></span></label>`).join(''); }catch(error){ $('queries').innerHTML=`<div class="empty error">${esc(error.message)}</div>`; } }
+    function checkedQueries(){ return [...document.querySelectorAll('#queries input:checked')].map(x=>x.value); }
+    function checkedPlatforms(){ return [...document.querySelectorAll('.checks input:checked')].map(x=>x.value); }
+    async function pollLive(){ try{ const data=await api('/api/status'), job=data.job; $('currentQuery').textContent=job.query||liveKeyword||'—'; $('detailCount').textContent=`${job.current||0}/${job.total||job.maximum||0}`; $('successCount').textContent=job.success||0; $('failedCount').textContent=job.failed||0; $('statusNote').textContent=`实时采集 ${job.state}：${job.message}${job.logs?.length?' · '+job.logs[job.logs.length-1]:''}`; $('confirmBtn').disabled=!job.can_confirm; $('stopBtn').disabled=!job.running; if(job.state==='done'){ clearInterval(liveTimer); liveTimer=null; $('startBtn').disabled=false; if(job.success>0){ const analyzed=await api('/api/food/analyze-local',{method:'POST',body:JSON.stringify({input_keyword:liveKeyword,include_acceptance_fixtures:false})}); update(analyzed); $('statusNote').textContent=`实时采集成功 ${job.success} 条并进入 food_v1 分析；热门仍需完整候选池证据。`; } } else if(job.state==='failed'||job.state==='stopped'){ clearInterval(liveTimer); liveTimer=null; $('startBtn').disabled=false; $('dataMode').value='pre'; $('statusNote').textContent=`实时路径未完成：${job.message}。已切换到“预采数据演示”，点击开始可继续。`; } }catch(error){ $('statusNote').textContent=error.message; } }
+    async function analyze(path='/api/food/analyze-local'){ if($('dataMode').value==='live'){ const queries=checkedQueries(), platforms=checkedPlatforms(); liveKeyword=queries[0]||$('seed').value.trim(); if(!liveKeyword||!platforms.length){$('statusNote').textContent='请至少选择一个关键词和平台。';return;} $('startBtn').disabled=true; try{await api('/api/start',{method:'POST',body:JSON.stringify({platform:platforms[0],query:liveKeyword,maximum:Math.min(3,Number($('poolSize').value)),model:'tiny'})}); liveTimer=setInterval(pollLive,1100); await pollLive();}catch(error){$('startBtn').disabled=false;$('statusNote').textContent=error.message;} return; } $('startBtn').disabled=true; $('statusNote').textContent='正在分析本地真实归档与任务书验收夹具…'; try{ const data=await api(path,{method:'POST',body:JSON.stringify({include_acceptance_fixtures:true})}); update(data); }catch(error){ $('statusNote').textContent=error.message; }finally{$('startBtn').disabled=false;} }
+    async function review(id,status){ const reason=prompt(status==='rejected'?'请输入驳回原因：':'请输入审核说明：',status==='rejected'?'人工判断不可用':'页面人工审核')||''; if(!reason)return; try{ update(await api('/api/food/review',{method:'POST',body:JSON.stringify({evidence_id:id,status,reason})})); }catch(error){ alert(error.message); } }
+    document.querySelectorAll('.tab').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));btn.classList.add('active');activeTab=btn.dataset.tab;render();});
+    $('taskMode').onchange=()=>{if($('taskMode').value==='general')location.href='/';}; $('planBtn').onclick=plan; $('startBtn').onclick=()=>analyze(); $('retryBtn').onclick=()=>analyze('/api/food/retry'); $('confirmBtn').onclick=async()=>{try{await api('/api/confirm-login',{method:'POST',body:'{}'});await pollLive();}catch(error){$('statusNote').textContent=error.message;}}; $('stopBtn').onclick=async()=>{try{await api('/api/stop',{method:'POST',body:'{}'});await pollLive();}catch(error){$('statusNote').textContent=error.message;}};
+    (async()=>{try{const cfg=await api('/api/food/config');$('version').textContent=`${cfg.manifest.schema_version} · ${cfg.real_sample_count} 条真实本地样本`;$('dateWindow').value=cfg.manifest.date_window_days;}catch{} await load(); await plan();})();
+  </script>
+</body>
+</html>

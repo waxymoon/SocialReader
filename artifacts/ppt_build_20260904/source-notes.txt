@@ -1,0 +1,18 @@
+Deck: AI 美食社媒情报 Agent
+Audience: 海博拓天笔试/面试官
+Purpose: demonstrate problem framing, V0-to-V1 rule/prompt decomposition, reproducible checks, live workflow, and honest limitations.
+
+Local evidence sources:
+- D:\hermes\求职\海博拓天笔试题\AI美食社媒情报Agent-V2任务书.md
+- D:\SocialReader\domains\food_v1\evals\stage1_acceptance_cases.jsonl
+- D:\SocialReader\deliverables\pre_capture_demo\eval_report.json
+- D:\SocialReader\deliverables\08_实施验收报告.md
+- D:\SocialReader\domains\food_v1\evals\gold_cases_v1.jsonl
+- D:\SocialReader\artifacts\ppt_overview_20260904.png
+- D:\SocialReader\artifacts\ppt_evidence_20260904.png
+- D:\SocialReader\artifacts\ppt_cover_20260904.png
+
+Claims policy:
+- “4/8 -> 8/8” is labeled as fixed boundary-example matching, not production accuracy.
+- “24 items” is labeled as a planned human-gold target; current completed human gold is 0/24.
+- 5/5, 16/16, and 55/55 are scoped to the current verified run/tests only.

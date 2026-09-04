@@ -1,0 +1,136 @@
+{"kind":"layout","layoutId":"/ppt/slideMasters/slideMaster1.xml","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout1.xml","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/y90nupkv","slide":1,"title":"SOCIALREADER · FOOD_V1","textShapes":5}
+{"kind":"textbox","id":"sh/utg3698n","slide":1,"name":"text","text":"SOCIALREADER · FOOD_V1","textPreview":"SOCIALREADER · FOOD_V1","textChars":22,"textLines":1,"bbox":[58,44,420,26]}
+{"kind":"textbox","id":"sh/547294r6","slide":1,"name":"deck-title","text":"AI 美食社媒\n情报 Agent","textPreview":"AI 美食社媒 | 情报 Agent","textChars":16,"textLines":2,"bbox":[58,132,530,150]}
+{"kind":"textbox","id":"sh/k3yl0zql","slide":1,"name":"text","text":"从通用采集到可追溯的领域 MVP","textPreview":"从通用采集到可追溯的领域 MVP","textChars":16,"textLines":1,"bbox":[58,316,520,45]}
+{"kind":"shape","id":"sh/7qp4be9c","slide":1,"name":"rule","bbox":[58,394,458,4]}
+{"kind":"textbox","id":"sh/65g3298r","slide":1,"name":"text","text":"问题定义 · 规则迭代 · 测试证据 · 产品演示","textPreview":"问题定义 · 规则迭代 · 测试证据 · 产品演示","textChars":25,"textLines":1,"bbox":[58,426,520,64]}
+{"kind":"textbox","id":"sh/ts7md4r2","slide":1,"name":"text","text":"Shay  |  海博拓天笔试汇报  |  2026.09","textPreview":"Shay  |  海博拓天笔试汇报  |  2026.09","textChars":29,"textLines":1,"bbox":[58,630,520,28]}
+{"kind":"shape","id":"sh/sryl4zqx","slide":1,"name":"hero-frame","bbox":[646,42,576,598]}
+{"kind":"image","id":"im/jqxw72dk","slide":1,"name":"","bbox":[662,58,544,566]}
+{"kind":"notes","id":"nt/y90nupkv","slide":1,"text":"开场先讲结论：我没有重做 SocialReader，而是在通用采集底座上增加 food_v1 领域模块。这个 MVP 的重点不是声称模型更聪明，而是让新品、热门和用户原句都有可追溯的证据与明确边界。\n\n[Sources]\n- D:\\SocialReader\\artifacts\\ppt_cover_20260904.png\n- D:\\hermes\\求职\\海博拓天笔试题\\AI美食社媒情报Agent-V2任务书.md\n[/Sources]"}
+{"kind":"slide","id":"sl/hwbqtkby","slide":2,"title":"01 · 问题定义","textShapes":9}
+{"kind":"textbox","id":"sh/nu58f2hs","slide":2,"name":"kicker","text":"01 · 问题定义","textPreview":"01 · 问题定义","textChars":9,"textLines":1,"bbox":[58,34,300,24]}
+{"kind":"textbox","id":"sh/9072xkry","slide":2,"name":"slide-title","text":"通用采集能拿到内容，但不能直接回答业务问题","textPreview":"通用采集能拿到内容，但不能直接回答业务问题","textChars":21,"textLines":1,"bbox":[58,64,1164,70]}
+{"kind":"shape","id":"sh/ozy1ofad","slide":2,"name":"rule","bbox":[58,144,1164,2]}
+{"kind":"textbox","id":"sh/b29kza94","slide":2,"name":"page","text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[1172,676,50,20]}
+{"kind":"textbox","id":"sh/a10jqpsj","slide":2,"name":"text","text":"原有能力","textPreview":"原有能力","textChars":4,"textLines":1,"bbox":[74,182,220,34]}
+{"kind":"textbox","id":"sh/x4r21kru","slide":2,"name":"text","text":"抓取公开内容\n保存正文、评论与视频\n复用浏览器登录态\n输出到本地知识库","textPreview":"抓取公开内容 | 保存正文、评论与视频 | 复用浏览器登录态 | 输出到本地知识库","textChars":35,"textLines":4,"bbox":[74,238,430,220]}
+{"kind":"textbox","id":"sh/w3i1sfa9","slide":2,"name":"text","text":"价值：保留了一套可复用的采集底座","textPreview":"价值：保留了一套可复用的采集底座","textChars":16,"textLines":1,"bbox":[74,520,430,52]}
+{"kind":"shape","id":"sh/r65knqtk","slide":2,"name":"rule","bbox":[618,184,2,424]}
+{"kind":"textbox","id":"sh/q5wjelsz","slide":2,"name":"text","text":"领域判断缺口","textPreview":"领域判断缺口","textChars":6,"textLines":1,"bbox":[674,182,260,34]}
+{"kind":"textbox","id":"sh/ove9o7yd","slide":2,"name":"text","text":"“新品”缺少变更证据\n“热门”容易被误说成全站热榜\n空泛表达会混入推荐语料\n结论缺少原句与位置","textPreview":"“新品”缺少变更证据 | “热门”容易被误说成全站热榜 | 空泛表达会混入推荐语料 | 结论缺少原句与位置","textChars":47,"textLines":4,"bbox":[674,238,500,220]}
+{"kind":"shape","id":"sh/9wnqhczy","slide":2,"name":"problem-callout","bbox":[674,500,478,84]}
+{"kind":"textbox","id":"sh/mtwrmxg7","slide":2,"name":"text","text":"核心问题不是抓不到，而是判断不可验证。","textPreview":"核心问题不是抓不到，而是判断不可验证。","textChars":19,"textLines":1,"bbox":[696,522,436,40]}
+{"kind":"notes","id":"nt/hwbqtkby","slide":2,"text":"这一页强调为什么要做领域升级。通用采集解决输入问题，但业务要的是可解释结论：为什么算新品、为什么相对热门、推荐理由来自哪一句。\n\n[Sources]\n- D:\\hermes\\求职\\海博拓天笔试题\\AI美食社媒情报Agent-V2任务书.md\n- D:\\SocialReader\\README.md\n[/Sources]"}
+{"kind":"slide","id":"sl/ofy9wn61","slide":3,"title":"02 · 迭代路径","textShapes":18}
+{"kind":"textbox","id":"sh/re9g7yxo","slide":3,"name":"kicker","text":"02 · 迭代路径","textPreview":"02 · 迭代路径","textChars":9,"textLines":1,"bbox":[58,34,300,24]}
+{"kind":"textbox","id":"sh/cza94vmx","slide":3,"name":"slide-title","text":"V1 把一次模糊萃取拆成四个可检查步骤","textPreview":"V1 把一次模糊萃取拆成四个可检查步骤","textChars":19,"textLines":1,"bbox":[58,64,1164,70]}
+{"kind":"shape","id":"sh/d0jax03i","slide":3,"name":"rule","bbox":[58,144,1164,2]}
+{"kind":"textbox","id":"sh/298ryl4v","slide":3,"name":"page","text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[1172,676,50,20]}
+{"kind":"textbox","id":"sh/3ah8rqlg","slide":3,"name":"text","text":"V0：一个通用“爆款结构萃取”任务","textPreview":"V0：一个通用“爆款结构萃取”任务","textChars":17,"textLines":1,"bbox":[72,176,760,34]}
+{"kind":"textbox","id":"sh/obq90bml","slide":3,"name":"text","text":"V1：每一步都有结构化输出、规则版本和失败状态","textPreview":"V1：每一步都有结构化输出、规则版本和失败状态","textChars":23,"textLines":1,"bbox":[72,216,850,36]}
+{"kind":"shape","id":"sh/pcjqtg36","slide":3,"name":"rule","bbox":[116,342,1020,4]}
+{"kind":"shape","id":"sh/m5cra54z","slide":3,"name":"node-0","bbox":[98,326,34,34]}
+{"kind":"textbox","id":"sh/n6ls3alk","slide":3,"name":"text","text":"01","textPreview":"01","textChars":2,"textLines":1,"bbox":[78,388,200,30]}
+{"kind":"textbox","id":"sh/n2l4fq98","slide":3,"name":"text","text":"食品知识抽取","textPreview":"食品知识抽取","textChars":6,"textLines":1,"bbox":[78,424,230,36]}
+{"kind":"textbox","id":"sh/m1c3mlsn","slide":3,"name":"text","text":"菜品、食材、味道\n口感、做法、场景","textPreview":"菜品、食材、味道 | 口感、做法、场景","textChars":17,"textLines":2,"bbox":[78,472,235,88]}
+{"kind":"shape","id":"sh/943mhgre","slide":3,"name":"node-1","bbox":[394,326,34,34]}
+{"kind":"textbox","id":"sh/83ulovat","slide":3,"name":"text","text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[374,388,200,30]}
+{"kind":"textbox","id":"sh/v6l4jq94","slide":3,"name":"text","text":"表达候选发现","textPreview":"表达候选发现","textChars":6,"textLines":1,"bbox":[374,424,230,36]}
+{"kind":"textbox","id":"sh/a5c3ql8z","slide":3,"name":"text","text":"保留具体原句\n过滤泛泛描述","textPreview":"保留具体原句 | 过滤泛泛描述","textChars":13,"textLines":2,"bbox":[374,472,235,88]}
+{"kind":"shape","id":"sh/x8nml0ra","slide":3,"name":"node-2","bbox":[690,326,34,34]}
+{"kind":"textbox","id":"sh/w7ulsvqp","slide":3,"name":"text","text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[670,388,200,30]}
+{"kind":"textbox","id":"sh/ja54na9g","slide":3,"name":"text","text":"独立证据审核","textPreview":"独立证据审核","textChars":6,"textLines":1,"bbox":[670,424,230,36]}
+{"kind":"textbox","id":"sh/i9w3u58v","slide":3,"name":"text","text":"检查对象、位置\n风险与可回溯性","textPreview":"检查对象、位置 | 风险与可回溯性","textChars":15,"textLines":2,"bbox":[670,472,235,88]}
+{"kind":"shape","id":"sh/e10f2twf","slide":3,"name":"node-3","bbox":[986,326,34,34]}
+{"kind":"textbox","id":"sh/f29gbyx0","slide":3,"name":"text","text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[966,388,200,30]}
+{"kind":"textbox","id":"sh/03ix43e5","slide":3,"name":"text","text":"推荐理由生成","textPreview":"推荐理由生成","textChars":6,"textLines":1,"bbox":[966,424,230,36]}
+{"kind":"textbox","id":"sh/14ryd8fq","slide":3,"name":"text","text":"仅使用通过证据\n不把 ID 当结论","textPreview":"仅使用通过证据 | 不把 ID 当结论","textChars":17,"textLines":2,"bbox":[966,472,235,88]}
+{"kind":"textbox","id":"sh/6d0fytg3","slide":3,"name":"text","text":"Prompt 被拆小，判断边界进入规则，最终结论保留人工审核。","textPreview":"Prompt 被拆小，判断边界进入规则，最终结论保留人工审核。","textChars":31,"textLines":1,"bbox":[72,620,1060,36]}
+{"kind":"notes","id":"nt/ofy9wn61","slide":3,"text":"这里不要把 V1 讲成单纯改写了一段 Prompt。真正的变化是任务拆分：抽取、候选、审核和理由各自保存，模型或规则的错误可以被定位，而不是只看到一段最终文案。\n\n[Sources]\n- D:\\SocialReader\\domains\\food_v1\\evals\\prompt_versions.json\n- D:\\SocialReader\\domains\\food_v1\\manifest.json\n[/Sources]"}
+{"kind":"slide","id":"sl/jyx0ra1s","slide":4,"title":"03 · 前后对比","textShapes":14}
+{"kind":"textbox","id":"sh/g36tgryd","slide":4,"name":"kicker","text":"03 · 前后对比","textPreview":"03 · 前后对比","textChars":9,"textLines":1,"bbox":[58,34,300,24]}
+{"kind":"textbox","id":"sh/1cj2d8b6","slide":4,"name":"slide-title","text":"边界样例暴露了 V0 的误收与漏收","textPreview":"边界样例暴露了 V0 的误收与漏收","textChars":17,"textLines":1,"bbox":[58,64,1164,70]}
+{"kind":"shape","id":"sh/0ba143al","slide":4,"name":"rule","bbox":[58,144,1164,2]}
+{"kind":"textbox","id":"sh/rm1k7yt4","slide":4,"name":"page","text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[1172,676,50,20]}
+{"kind":"textbox","id":"sh/ql8jytsj","slide":4,"name":"text","text":"V0 · 宽松关键词基线","textPreview":"V0 · 宽松关键词基线","textChars":12,"textLines":1,"bbox":[72,182,470,36]}
+{"kind":"textbox","id":"sh/doj29oba","slide":4,"name":"text","text":"“好吃绝了”","textPreview":"“好吃绝了”","textChars":6,"textLines":1,"bbox":[72,246,470,58]}
+{"kind":"textbox","id":"sh/sna103ap","slide":4,"name":"text","text":"命中“好吃 / 绝” → 误收","textPreview":"命中“好吃 / 绝” → 误收","textChars":15,"textLines":1,"bbox":[72,316,470,32]}
+{"kind":"textbox","id":"sh/3ihk3et8","slide":4,"name":"text","text":"“每一口都能嚼到虾肉”","textPreview":"“每一口都能嚼到虾肉”","textChars":11,"textLines":1,"bbox":[72,400,470,58]}
+{"kind":"textbox","id":"sh/ih8ju9sn","slide":4,"name":"text","text":"未命中关键词 → 漏收","textPreview":"未命中关键词 → 漏收","textChars":11,"textLines":1,"bbox":[72,470,470,32]}
+{"kind":"shape","id":"sh/kbm987y5","slide":4,"name":"rule","bbox":[622,182,2,382]}
+{"kind":"textbox","id":"sh/5cva1cfq","slide":4,"name":"text","text":"V1 · 食品表达规则","textPreview":"V1 · 食品表达规则","textChars":11,"textLines":1,"bbox":[678,182,470,36]}
+{"kind":"textbox","id":"sh/i94r6xgz","slide":4,"name":"text","text":"泛泛夸赞，没有对象和感官细节","textPreview":"泛泛夸赞，没有对象和感官细节","textChars":14,"textLines":1,"bbox":[678,246,470,58]}
+{"kind":"textbox","id":"sh/jadsz2xk","slide":4,"name":"text","text":"generic noise → 过滤","textPreview":"generic noise → 过滤","textChars":18,"textLines":1,"bbox":[678,316,470,32]}
+{"kind":"textbox","id":"sh/w72947yt","slide":4,"name":"text","text":"具体食材＋明确口感体验","textPreview":"具体食材＋明确口感体验","textChars":11,"textLines":1,"bbox":[678,400,470,58]}
+{"kind":"textbox","id":"sh/x8vaxsfe","slide":4,"name":"text","text":"specific evidence → 保留待审","textPreview":"specific evidence → 保留待审","textChars":24,"textLines":1,"bbox":[678,470,470,32]}
+{"kind":"shape","id":"sh/a5kr2xg3","slide":4,"name":"scope-note","bbox":[72,590,1076,58]}
+{"kind":"textbox","id":"sh/v6tsv2xo","slide":4,"name":"text","text":"说明：这是固定边界样例的规则对比，不是大模型 Prompt A/B。","textPreview":"说明：这是固定边界样例的规则对比，不是大模型 Prompt A/B。","textChars":34,"textLines":1,"bbox":[94,606,1030,30]}
+{"kind":"notes","id":"nt/jyx0ra1s","slide":4,"text":"用两个最容易理解的例子讲清楚。V0 依赖宽松关键词，所以会把空泛夸赞收进来，也会漏掉没有预设关键词但非常具体的表达。V1 的目标是提升边界质量，而不是在这里宣称生产准确率。\n\n[Sources]\n- D:\\SocialReader\\eval_food.py\n- D:\\SocialReader\\domains\\food_v1\\evals\\stage1_acceptance_cases.jsonl\n[/Sources]"}
+{"kind":"slide","id":"sl/i107q5of","slide":5,"title":"04 · 评测设计","textShapes":12}
+{"kind":"textbox","id":"sh/i54fmlc7","slide":5,"name":"kicker","text":"04 · 评测设计","textPreview":"04 · 评测设计","textChars":9,"textLines":1,"bbox":[58,34,300,24]}
+{"kind":"textbox","id":"sh/dgbulwnm","slide":5,"name":"slide-title","text":"测试夹具和人工金标准必须分开","textPreview":"测试夹具和人工金标准必须分开","textChars":14,"textLines":1,"bbox":[58,64,1164,70]}
+{"kind":"shape","id":"sh/cf2tcr61","slide":5,"name":"rule","bbox":[58,144,1164,2]}
+{"kind":"textbox","id":"sh/z2tcnm5s","slide":5,"name":"page","text":"05","textPreview":"05","textChars":2,"textLines":1,"bbox":[1172,676,50,20]}
+{"kind":"shape","id":"sh/yhkbe1o7","slide":5,"name":"contract-layer","bbox":[64,180,520,360]}
+{"kind":"textbox","id":"sh/l4bupwny","slide":5,"name":"text","text":"8 条","textPreview":"8 条","textChars":3,"textLines":1,"bbox":[92,210,220,72]}
+{"kind":"textbox","id":"sh/032tgr6d","slide":5,"name":"text","text":"固定边界样例","textPreview":"固定边界样例","textChars":6,"textLines":1,"bbox":[92,284,360,36]}
+{"kind":"textbox","id":"sh/n6dcr65o","slide":5,"name":"text","text":"开发时预设保留/过滤答案\n用于防止规则回退\nV0 匹配 4/8，V1 匹配 8/8","textPreview":"开发时预设保留/过滤答案 | 用于防止规则回退 | V0 匹配 4/8，V1 匹配 8/8","textChars":41,"textLines":3,"bbox":[92,346,420,116]}
+{"kind":"textbox","id":"sh/m5kbi1oj","slide":5,"name":"text","text":"不能代表真实业务准确率","textPreview":"不能代表真实业务准确率","textChars":11,"textLines":1,"bbox":[92,486,420,30]}
+{"kind":"shape","id":"sh/w32dkbuh","slide":5,"name":"gold-layer","bbox":[636,180,520,360]}
+{"kind":"textbox","id":"sh/x4vedgvm","slide":5,"name":"text","text":"0 / 24","textPreview":"0 / 24","textChars":6,"textLines":1,"bbox":[664,210,260,72]}
+{"kind":"textbox","id":"sh/ahkvi1cb","slide":5,"name":"text","text":"已完成人工金标准","textPreview":"已完成人工金标准","textChars":8,"textLines":1,"bbox":[664,284,400,36]}
+{"kind":"textbox","id":"sh/v2twb6dw","slide":5,"name":"text","text":"24 篇只是计划验收规模\n当前收集 5 篇待标内容\n主标注者、复核者均为空","textPreview":"24 篇只是计划验收规模 | 当前收集 5 篇待标内容 | 主标注者、复核者均为空","textChars":37,"textLines":3,"bbox":[664,346,420,116]}
+{"kind":"textbox","id":"sh/k7mxovud","slide":5,"name":"text","text":"production_metrics = null","textPreview":"production_metrics = null","textChars":25,"textLines":1,"bbox":[664,486,420,30]}
+{"kind":"textbox","id":"sh/58vehgvy","slide":5,"name":"text","text":"结论：现在能证明规则符合预设边界，不能声称真实准确率提升。","textPreview":"结论：现在能证明规则符合预设边界，不能声称真实准确率提升。","textChars":29,"textLines":1,"bbox":[72,592,1076,44]}
+{"kind":"notes","id":"nt/i107q5of","slide":5,"text":"这页主动回答面试官可能追问的‘谁标的’。8 条是开发验收夹具；24 篇是未来计划，目前没有任何人完成标注。因此系统明确输出 production_metrics=null。\n\n[Sources]\n- D:\\SocialReader\\domains\\food_v1\\evals\\gold_cases_v1.jsonl\n- D:\\SocialReader\\deliverables\\pre_capture_demo\\eval_report.json\n[/Sources]"}
+{"kind":"slide","id":"sl/x8f69ofe","slide":6,"title":"05 · 验证结果","textShapes":14}
+{"kind":"textbox","id":"sh/svmt4v6t","slide":6,"name":"kicker","text":"05 · 验证结果","textPreview":"05 · 验证结果","textChars":9,"textLines":1,"bbox":[58,34,300,24]}
+{"kind":"textbox","id":"sh/yhg7epsj","slide":6,"name":"slide-title","text":"当前成果只报告可复现的工程证据","textPreview":"当前成果只报告可复现的工程证据","textChars":15,"textLines":1,"bbox":[58,64,1164,70]}
+{"kind":"shape","id":"sh/zi98nu94","slide":6,"name":"rule","bbox":[58,144,1164,2]}
+{"kind":"textbox","id":"sh/87ipkzal","slide":6,"name":"page","text":"06","textPreview":"06","textChars":2,"textLines":1,"bbox":[1172,676,50,20]}
+{"kind":"textbox","id":"sh/98rqt4r6","slide":6,"name":"text","text":"以下数据来自本次本地运行与自动化检查；口径均限定在当前样本和当前代码。","textPreview":"以下数据来自本次本地运行与自动化检查；口径均限定在当前样本和当前代码。","textChars":35,"textLines":1,"bbox":[72,174,1080,38]}
+{"kind":"shape","id":"sh/ml07i9sv","slide":6,"name":"metric-0","bbox":[64,280,350,292]}
+{"kind":"textbox","id":"sh/7m98ru9g","slide":6,"name":"text","text":"5 / 5","textPreview":"5 / 5","textChars":5,"textLines":1,"bbox":[92,326,294,76]}
+{"kind":"textbox","id":"sh/oryp8fah","slide":6,"name":"text","text":"真实详情采集成功","textPreview":"真实详情采集成功","textChars":8,"textLines":1,"bbox":[92,422,294,62]}
+{"kind":"textbox","id":"sh/pc76hkr2","slide":6,"name":"text","text":"小红书 3 条＋抖音 2 条","textPreview":"小红书 3 条＋抖音 2 条","textChars":14,"textLines":1,"bbox":[92,510,294,42]}
+{"kind":"shape","id":"sh/h4bupgn6","slide":6,"name":"metric-1","bbox":[450,280,350,292]}
+{"kind":"textbox","id":"sh/w32twb6l","slide":6,"name":"text","text":"16 / 16","textPreview":"16 / 16","textChars":7,"textLines":1,"bbox":[478,326,294,76]}
+{"kind":"textbox","id":"sh/v2tcn650","slide":6,"name":"text","text":"单元与回归测试通过","textPreview":"单元与回归测试通过","textChars":9,"textLines":1,"bbox":[478,422,294,62]}
+{"kind":"textbox","id":"sh/u1kbu1ov","slide":6,"name":"text","text":"阶段 1–4 与通用功能回归","textPreview":"阶段 1–4 与通用功能回归","textChars":14,"textLines":1,"bbox":[478,510,294,42]}
+{"kind":"shape","id":"sh/5svutgni","slide":6,"name":"metric-2","bbox":[836,280,350,292]}
+{"kind":"textbox","id":"sh/47mt0b6x","slide":6,"name":"text","text":"55 / 55","textPreview":"55 / 55","textChars":7,"textLines":1,"bbox":[864,326,294,76]}
+{"kind":"textbox","id":"sh/j6dcr65c","slide":6,"name":"text","text":"候选表达可回溯原句","textPreview":"候选表达可回溯原句","textChars":9,"textLines":1,"bbox":[864,422,294,62]}
+{"kind":"textbox","id":"sh/i54bylor","slide":6,"name":"text","text":"仍全部处于人工待审核状态","textPreview":"仍全部处于人工待审核状态","textChars":12,"textLines":1,"bbox":[864,510,294,42]}
+{"kind":"textbox","id":"sh/twfux0ne","slide":6,"name":"text","text":"未报告：生产准确率、平台全站热度、人工确认推荐理由。","textPreview":"未报告：生产准确率、平台全站热度、人工确认推荐理由。","textChars":26,"textLines":1,"bbox":[72,620,1070,36]}
+{"kind":"notes","id":"nt/x8f69ofe","slide":6,"text":"只讲三类已经复现的结果：采集成功、测试通过、证据可回溯。55 条候选不是 55 条高质量推荐语，它们仍然待人工审核。\n\n[Sources]\n- D:\\SocialReader\\deliverables\\08_实施验收报告.md\n- D:\\SocialReader\\deliverables\\pre_capture_demo\\eval_report.json\n[/Sources]"}
+{"kind":"slide","id":"sl/gnmp4jqx","slide":7,"title":"06 · 产品功能","textShapes":8}
+{"kind":"textbox","id":"sh/n6x0fqlo","slide":7,"name":"kicker","text":"06 · 产品功能","textPreview":"06 · 产品功能","textChars":9,"textLines":1,"bbox":[58,34,300,24]}
+{"kind":"textbox","id":"sh/cb2tkvap","slide":7,"name":"slide-title","text":"页面把采集、判断和人工审核连成一条演示链路","textPreview":"页面把采集、判断和人工审核连成一条演示链路","textChars":21,"textLines":1,"bbox":[58,64,1164,70]}
+{"kind":"shape","id":"sh/dcbud0ra","slide":7,"name":"rule","bbox":[58,144,1164,2]}
+{"kind":"textbox","id":"sh/ydkbm5sv","slide":7,"name":"page","text":"07","textPreview":"07","textChars":2,"textLines":1,"bbox":[1172,676,50,20]}
+{"kind":"shape","id":"sh/zedcfa9g","slide":7,"name":"overview-frame","bbox":[58,176,560,390]}
+{"kind":"textbox","id":"sh/l0vuh0rm","slide":7,"name":"text","text":"① 任务设置与关键词预览","textPreview":"① 任务设置与关键词预览","textChars":12,"textLines":1,"bbox":[78,500,500,32]}
+{"kind":"textbox","id":"sh/eh0ba1sr","slide":7,"name":"text","text":"预览不篡改最近运行指标；点击开始后才更新。","textPreview":"预览不篡改最近运行指标；点击开始后才更新。","textChars":21,"textLines":1,"bbox":[78,538,500,24]}
+{"kind":"shape","id":"sh/fi9c369c","slide":7,"name":"evidence-frame","bbox":[660,176,560,390]}
+{"kind":"textbox","id":"sh/a9ojq5kz","slide":7,"name":"text","text":"② 原句证据与人工审核","textPreview":"② 原句证据与人工审核","textChars":11,"textLines":1,"bbox":[680,500,500,32]}
+{"kind":"textbox","id":"sh/xcz2l03q","slide":7,"name":"text","text":"正文、评论、ASR 都保留来源位置与待审状态。","textPreview":"正文、评论、ASR 都保留来源位置与待审状态。","textChars":23,"textLines":1,"bbox":[680,538,500,24]}
+{"kind":"textbox","id":"sh/cbq1sv25","slide":7,"name":"text","text":"演示顺序：输入关键词 → 候选池 → 详情采集 → 食品卡 → 表达审核 → 推荐理由","textPreview":"演示顺序：输入关键词 → 候选池 → 详情采集 → 食品卡 → 表达审核 → 推荐理由","textChars":43,"textLines":1,"bbox":[72,616,1100,34]}
+{"kind":"image","id":"im/lozex8zq","slide":7,"name":"","bbox":[70,188,536,290]}
+{"kind":"image","id":"im/y1ofmd0z","slide":7,"name":"","bbox":[672,188,536,290]}
+{"kind":"notes","id":"nt/gnmp4jqx","slide":7,"text":"现场演示只走最短闭环。先展示关键词预览和当前运行统计，再切换到活人感表达库，说明每条原句都能看到来源类型、位置、规则判断和人工状态。\n\n[Sources]\n- D:\\SocialReader\\artifacts\\ppt_overview_20260904.png\n- D:\\SocialReader\\artifacts\\ppt_evidence_20260904.png\n[/Sources]"}
+{"kind":"slide","id":"sl/fu1gfa1s","slide":8,"title":"07 · 结论与下一步","textShapes":8}
+{"kind":"textbox","id":"sh/m5gvmhwn","slide":8,"name":"kicker","text":"07 · 结论与下一步","textPreview":"07 · 结论与下一步","textChars":11,"textLines":1,"bbox":[58,34,300,24]}
+{"kind":"textbox","id":"sh/18byd4zy","slide":8,"name":"slide-title","text":"这个 MVP 的价值是可验证，而不是假装已经成熟","textPreview":"这个 MVP 的价值是可验证，而不是假装已经成熟","textChars":24,"textLines":1,"bbox":[58,64,1164,70]}
+{"kind":"shape","id":"sh/g72x4zyd","slide":8,"name":"rule","bbox":[58,144,1164,2]}
+{"kind":"textbox","id":"sh/ri9g7uhw","slide":8,"name":"page","text":"08","textPreview":"08","textChars":2,"textLines":1,"bbox":[1172,676,50,20]}
+{"kind":"textbox","id":"sh/6h0fypgb","slide":8,"name":"text","text":"已经完成","textPreview":"已经完成","textChars":4,"textLines":1,"bbox":[72,186,320,36]}
+{"kind":"textbox","id":"sh/tkby9kzm","slide":8,"name":"text","text":"✓ 保留通用采集底座\n✓ 增加 food_v1 独立模块\n✓ 新品、热门、表达拆分规则\n✓ 原句、位置和审核状态可追溯\n✓ 失败与证据不足明确展示","textPreview":"✓ 保留通用采集底座 | ✓ 增加 food_v1 独立模块 | ✓ 新品、热门、表达拆分规则 | ✓ 原句、位置和审核状态可追溯 | ✓ 失败与证据不足明确展示","textChars":73,"textLines":5,"bbox":[72,244,470,250]}
+{"kind":"shape","id":"sh/sjix0zy1","slide":8,"name":"rule","bbox":[622,186,2,360]}
+{"kind":"textbox","id":"sh/je9g3ahk","slide":8,"name":"text","text":"仍待完成","textPreview":"仍待完成","textChars":4,"textLines":1,"bbox":[678,186,320,36]}
+{"kind":"textbox","id":"sh/id0fu50z","slide":8,"name":"text","text":"→ 重构食品层级与多维属性\n→ 完成 24 篇人工金标准\n→ 双人复核并计算真实指标\n→ 处理 ASR 错字与令牌过期\n→ 扩大同平台候选池验证","textPreview":"→ 重构食品层级与多维属性 | → 完成 24 篇人工金标准 | → 双人复核并计算真实指标 | → 处理 ASR 错字与令牌过期 | → 扩大同平台候选池验证","textChars":72,"textLines":5,"bbox":[678,244,470,250]}
+{"kind":"shape","id":"sh/o7ydoret","slide":8,"name":"closing-statement","bbox":[72,570,1076,72]}
+{"kind":"textbox","id":"sh/98rehwve","slide":8,"name":"text","text":"先让每个结论站得住，再逐步追求更高的自动化。","textPreview":"先让每个结论站得住，再逐步追求更高的自动化。","textChars":22,"textLines":1,"bbox":[100,588,1020,38]}
+{"kind":"notes","id":"nt/fu1gfa1s","slide":8,"text":"收尾回到开场：这个版本不是完成所有智能判断，而是把一个容易夸大的演示题做成可验证、可追溯、可继续迭代的 MVP。下一步优先补真实人工金标准和专业品类体系。\n\n[Sources]\n- D:\\SocialReader\\deliverables\\05_已知限制与后续计划.md\n- D:\\SocialReader\\deliverables\\08_实施验收报告.md\n[/Sources]"}
