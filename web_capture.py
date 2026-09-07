@@ -29,6 +29,7 @@ from domain_pipeline import (
     run_analysis,
     update_review,
 )
+from export_knowledge_base import run_export
 from food_metrics import read_jsonl
 
 
@@ -161,7 +162,7 @@ class JobManager:
             data["can_confirm"] = data["running"] and data["state"] == "awaiting_login"
             return data
 
-    def start(self, platform: str, query: str, maximum: int, model: str) -> dict[str, Any]:
+    def start(self, platform: str, query: str, maximum: int, model: str, content_type: str = "all") -> dict[str, Any]:
         if platform not in {"xhs", "dy", "dyvideo"}:
             raise ValueError("平台参数无效")
         query = query.strip()
@@ -169,8 +170,10 @@ class JobManager:
             raise ValueError("请输入关键词或抖音链接")
         if len(query) > 300:
             raise ValueError("输入内容过长")
-        if not 1 <= maximum <= 20:
-            raise ValueError("采集数量必须在 1–20 之间")
+        if not 1 <= maximum <= 50:
+            raise ValueError("采集数量必须在 1–50 之间")
+        if content_type not in {"all", "image", "video"}:
+            raise ValueError("内容类型参数无效")
         if model not in {"tiny", "base", "small", "medium"}:
             raise ValueError("转写模型无效")
         with self.lock:
@@ -187,6 +190,8 @@ class JobManager:
                 query,
                 "--max",
                 str(maximum),
+                "--content-type",
+                content_type,
                 "--asr-model",
                 model,
             ]
@@ -428,6 +433,7 @@ class SocialReaderHandler(BaseHTTPRequestHandler):
                     str(payload.get("query", "")),
                     int(payload.get("maximum", 3)),
                     str(payload.get("model", "small")),
+                    str(payload.get("content_type", "all")),
                 )
                 self._json({"ok": True, "job": job})
                 return
@@ -444,7 +450,12 @@ class SocialReaderHandler(BaseHTTPRequestHandler):
                 input_root = OUTPUT_ROOT / keyword if keyword else FOOD_SAMPLE_ROOT
                 if not input_root.is_dir():
                     raise RuntimeError(f"本地采集目录不存在：{keyword or FOOD_SAMPLE_ROOT.name}")
-                items = load_analysis_items(input_root, include_fixtures=include_fixtures, limit=5)
+                try:
+                    analysis_limit = int(payload.get("limit", 5))
+                except (TypeError, ValueError):
+                    analysis_limit = 5
+                analysis_limit = max(1, min(analysis_limit, 60))
+                items = load_analysis_items(input_root, include_fixtures=include_fixtures, limit=analysis_limit)
                 if not items:
                     raise RuntimeError("没有可分析的本地美食样本")
                 output_dir = run_analysis(items)
@@ -456,6 +467,22 @@ class SocialReaderHandler(BaseHTTPRequestHandler):
                     raise RuntimeError("还没有 food_v1 运行结果")
                 updated = update_review(output_dir, str(payload.get("evidence_id", "")), str(payload.get("status", "")), str(payload.get("reason", "")))
                 self._json({"ok": True, "updated": updated, **food_run_payload(output_dir)})
+                return
+            if self.path == "/api/food/export":
+                scope = str(payload.get("scope", "all"))
+                include_drinks = bool(payload.get("include_drinks", False))
+                try:
+                    path, stats = run_export(
+                        include_drinks=include_drinks, latest_only=(scope == "latest")
+                    )
+                except RuntimeError as exc:
+                    self._error(str(exc), 409)
+                    return
+                try:
+                    os.startfile(str(path))  # 本地演示：生成后直接弹出 Excel
+                except Exception:
+                    pass
+                self._json({"ok": True, "path": str(path), "stats": stats})
                 return
             if self.path == "/api/confirm-login":
                 self._json({"ok": True, "job": JOBS.confirm_login()})

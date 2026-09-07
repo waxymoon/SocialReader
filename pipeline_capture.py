@@ -298,6 +298,14 @@ def child_count(element: Any, selectors: tuple[str, ...]) -> int | None:
     return None
 
 
+def card_is_video(card: Any) -> bool:
+    """小红书搜索卡片是否有播放角标（span.play-icon）→ 视频笔记；无 → 图文。"""
+    try:
+        return bool(card.ele("css:.play-icon", timeout=0.4))
+    except Exception:
+        return False
+
+
 def card_link(card: Any, patterns: tuple[str, ...]) -> tuple[str, str] | None:
     """从一张搜索卡片中取详情链接，并优先使用有文字的标题链接。"""
     chosen_url = ""
@@ -328,13 +336,16 @@ def card_link(card: Any, patterns: tuple[str, ...]) -> tuple[str, str] | None:
     return chosen_title[:100], chosen_url
 
 
-def collect_xhs_ranked_links(page: Any, maximum: int) -> list[tuple[str, str]]:
-    """读取小红书当前搜索页全部卡片，按卡片点赞数降序取前 N 条。"""
+def collect_xhs_ranked_links(page: Any, maximum: int, content_type: str = "all") -> list[tuple[str, str]]:
+    """读取小红书当前搜索页全部卡片，按卡片点赞数降序取前 N 条。
+
+    content_type: "all" | "image" | "video"——video=仅视频笔记(有 play-icon)，image=仅图文。
+    """
     try:
         cards = page.eles(".note-item", timeout=5)
     except Exception:
         return []
-    candidates: list[tuple[str, str, int | None, int]] = []
+    candidates: list[tuple[str, str, int | None, int, bool]] = []
     seen: set[str] = set()
     for position, card in enumerate(cards):
         item = card_link(card, ("/search_result/", "/explore/", "/discovery/"))
@@ -346,17 +357,32 @@ def collect_xhs_ranked_links(page: Any, maximum: int) -> list[tuple[str, str]]:
             continue
         seen.add(url)
         likes = child_count(card, (".count", ".like-wrapper"))
-        candidates.append((title, url, likes, position))
+        candidates.append((title, url, likes, position, card_is_video(card)))
     if not candidates:
         return []
+    # 内容类型筛选（视频=有 play-icon；图文=无）
+    if content_type == "video":
+        candidates = [c for c in candidates if c[4]]
+        if not candidates:
+            print("[类型筛选] 当前搜索页没有匹配的视频笔记，请换关键词或改选“图文/全部”")
+            return []
+    elif content_type == "image":
+        candidates = [c for c in candidates if not c[4]]
+        if not candidates:
+            print("[类型筛选] 当前搜索页没有匹配的图文笔记，请换关键词或改选“视频/全部”")
+            return []
+    else:
+        pass
     if any(item[2] is not None for item in candidates):
         candidates.sort(key=lambda item: (item[2] is not None, item[2] or -1), reverse=True)
-        print(f"[点赞排序] 小红书：从当前页 {len(candidates)} 条候选中，按点赞数取前 {min(maximum, len(candidates))} 条")
-        for rank, (title, _url, likes, _position) in enumerate(candidates[:maximum], 1):
+        picked = min(maximum, len(candidates))
+        kind_note = {"video": "（仅视频）", "image": "（仅图文）"}.get(content_type, "")
+        print(f"[点赞排序] 小红书{kind_note}：从当前页 {len(candidates)} 条候选中，按点赞数取前 {picked} 条")
+        for rank, (title, _url, likes, _position, _is_video) in enumerate(candidates[:maximum], 1):
             print(f"  {rank}. {likes if likes is not None else '未读取'} 赞 · {title[:50]}")
     else:
         print("[点赞排序] 小红书卡片未读取到点赞数，保留页面原顺序")
-    return [(title, url) for title, url, _likes, _position in candidates[:maximum]]
+    return [(title, url) for title, url, _likes, _position, _is_video in candidates[:maximum]]
 
 
 DY_LIKE_SELECTORS = (
@@ -1068,10 +1094,10 @@ def write_summary(
     return summary_path
 
 
-def collect_search_links(page: Any, platform: str, keyword: str, maximum: int) -> list[tuple[str, str]]:
+def collect_search_links(page: Any, platform: str, keyword: str, maximum: int, content_type: str = "all") -> list[tuple[str, str]]:
     if platform == "xhs":
         cmd_search_xhs(page, keyword)
-        ranked = collect_xhs_ranked_links(page, maximum)
+        ranked = collect_xhs_ranked_links(page, maximum, content_type)
         if ranked:
             return ranked
         # 搜索卡片的 /search_result/<id>?xsec_token=... 才能可靠进入详情；
@@ -1082,6 +1108,8 @@ def collect_search_links(page: Any, platform: str, keyword: str, maximum: int) -
             or extract_links(page, "/discovery/")
         )
         return unique_links(links, "https://www.xiaohongshu.com", maximum)
+    if content_type == "image":
+        print("[类型筛选] 抖音为视频平台，无法只抓图文；已按全部视频继续（或改选“全部/视频”）")
     cmd_search_dy(page, keyword)
     ranked = collect_dy_ranked_anchor_links(page, maximum)
     if ranked:
@@ -1152,14 +1180,20 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("platform", choices=("xhs", "dy", "dyvideo"), help="xhs / dy / dyvideo")
     parser.add_argument("query", help="搜索关键词；dyvideo 模式下填写视频链接")
     parser.add_argument("--max", type=int, default=20, dest="maximum", help="最多处理条数，默认 20")
+    parser.add_argument(
+        "--content-type",
+        default="all",
+        choices=("all", "image", "video"),
+        help="内容类型筛选：all 全部 / image 仅图文(小红书) / video 仅视频",
+    )
     parser.add_argument("--asr-model", default="small", choices=("tiny", "base", "small", "medium"), help="faster-whisper 模型，默认 small")
     return parser
 
 
 def main() -> int:
     args = build_parser().parse_args()
-    if args.maximum < 1:
-        print("[参数错误] --max 必须大于 0")
+    if args.maximum < 1 or args.maximum > 50:
+        print("[参数错误] --max 必须在 1–50 之间")
         return 2
     if not check_debug_port():
         return 1
@@ -1192,7 +1226,7 @@ def main() -> int:
         links = [("抖音单视频", args.query)]
     else:
         try:
-            links = collect_search_links(page, args.platform, args.query, args.maximum)
+            links = collect_search_links(page, args.platform, args.query, args.maximum, args.content_type)
         except Exception as exc:
             print(f"[搜索失败] {exc}")
             links = []
