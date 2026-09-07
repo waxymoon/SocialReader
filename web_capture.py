@@ -109,24 +109,30 @@ def latest_food_run() -> Path | None:
 
 
 def food_run_payload(output_dir: Path | None = None) -> dict[str, Any]:
+    empty = {"available": False, "cards": [], "expressions": [], "reasons": [], "reviews": [], "candidate_pool": [], "selected_candidates": [], "random_baseline": {}, "meta": {}, "run_dir": ""}
     run = output_dir or latest_food_run()
     if not run:
-        return {"available": False, "cards": [], "expressions": [], "reasons": [], "meta": {}}
+        return empty
     meta_path = run / "run_meta.json"
     meta = json.loads(meta_path.read_text(encoding="utf-8")) if meta_path.is_file() else {}
     baseline_path = run / "random_baseline.json"
-    return {
-        "available": True,
-        "run_dir": str(run),
-        "cards": read_jsonl(run / "food_cards.jsonl"),
-        "expressions": read_jsonl(run / "vivid_expressions.jsonl"),
-        "reasons": read_jsonl(run / "recommendation_reasons.jsonl"),
-        "reviews": read_jsonl(run / "review_results.jsonl"),
-        "candidate_pool": read_jsonl(run / "candidate_pool_scored.jsonl"),
-        "selected_candidates": read_jsonl(run / "selected_candidates.jsonl"),
-        "random_baseline": json.loads(baseline_path.read_text(encoding="utf-8")) if baseline_path.is_file() else {},
-        "meta": meta,
-    }
+    try:
+        return {
+            "available": True,
+            "run_dir": str(run),
+            "cards": read_jsonl(run / "food_cards.jsonl"),
+            "expressions": read_jsonl(run / "vivid_expressions.jsonl"),
+            "reasons": read_jsonl(run / "recommendation_reasons.jsonl"),
+            "reviews": read_jsonl(run / "review_results.jsonl"),
+            "candidate_pool": read_jsonl(run / "candidate_pool_scored.jsonl"),
+            "selected_candidates": read_jsonl(run / "selected_candidates.jsonl"),
+            "random_baseline": json.loads(baseline_path.read_text(encoding="utf-8")) if baseline_path.is_file() else {},
+            "meta": meta,
+        }
+    except (ValueError, json.JSONDecodeError, OSError) as exc:
+        # 读到写入中的半成品/损坏文件时降级返回，不把整个页面打成 500（2026-09-07 修复）
+        empty["error"] = f"{type(exc).__name__}: {exc}"
+        return empty
 
 
 class JobManager:
@@ -472,6 +478,14 @@ class SocialReaderHandler(BaseHTTPRequestHandler):
                     raise RuntimeError("还没有 food_v1 运行结果")
                 updated = update_review(output_dir, str(payload.get("evidence_id", "")), str(payload.get("status", "")), str(payload.get("reason", "")))
                 self._json({"ok": True, "updated": updated, **food_run_payload(output_dir)})
+                return
+            if self.path == "/api/food/semantic-review":
+                from evaluate_semantic import apply_semantic_to_run  # noqa: PLC0415
+                output_dir = latest_food_run()
+                if not output_dir:
+                    raise RuntimeError("还没有 food_v1 运行结果")
+                result = apply_semantic_to_run(output_dir)
+                self._json({"ok": True, "semantic": result, **food_run_payload(output_dir)})
                 return
             if self.path == "/api/food/export":
                 scope = str(payload.get("scope", "all"))

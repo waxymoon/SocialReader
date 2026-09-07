@@ -36,3 +36,6 @@ TASK_*.md
 .vscode/
 .DS_Store
 Thumbs.db
+
+# Excel 临时锁文件
+~\$*

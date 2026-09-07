@@ -28,7 +28,8 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     if not path.exists():
         return rows
-    for line_number, raw in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+    # split("\n") 而非 splitlines()：正文可含 U+2028 行分隔符，splitlines 会误切行（2026-09-07 实测坑）
+    for line_number, raw in enumerate(path.read_text(encoding="utf-8").split("\n"), 1):
         if not raw.strip():
             continue
         value = json.loads(raw)
@@ -40,9 +41,17 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
 
 def write_jsonl(path: Path, rows: Iterable[dict[str, Any]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8", newline="\n") as handle:
+    # 原子写：先写临时文件再 replace——避免读取方撞上"写到一半的截断文件"（2026-09-07 实测踩坑）
+    tmp = path.with_name(path.name + ".tmp")
+    with tmp.open("w", encoding="utf-8", newline="\n") as handle:
         for row in rows:
-            handle.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
+            line = json.dumps(row, ensure_ascii=False, sort_keys=True)
+            line = line.replace("\u2028", "\\u2028").replace("\u2029", "\\u2029")  # 行分隔符转义防误切
+            handle.write(line + "\n")
+        handle.flush()
+        import os as _os
+        _os.fsync(handle.fileno())
+    tmp.replace(path)
 
 
 def normalize_source_url(value: Any) -> str:

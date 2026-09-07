@@ -463,24 +463,32 @@ def build_reasons(cards: list[dict[str, Any]]) -> list[dict[str, Any]]:
         for evidence in card.get("evidences", []):
             if evidence.get("human_review_status") == "rejected":
                 continue
-            if not (evidence.get("rule_review_status") == "pass" or evidence.get("human_review_status") == "approved"):
+            model_pass = bool((evidence.get("model_review") or {}).get("pass"))
+            if not (evidence.get("rule_review_status") == "pass"
+                    or evidence.get("human_review_status") == "approved"
+                    or model_pass):
                 continue
             if evidence.get("risk_flags"):
                 continue
             if evidence.get("aspect") == "新品证据":
                 continue
-            target = evidence.get("target") or "这道美食"
-            attribute = evidence.get("normalized_attribute") or evidence.get("aspect")
-            reason = f"{target}{attribute}有记忆点，适合想吃点有滋味的时候。"
-            if not 15 <= len(reason.rstrip("。")) <= 35:
-                reason = f"{target}{attribute}，适合想换换口味的时候。"
             approved = evidence.get("human_review_status") == "approved"
+            quote = str(evidence.get("exact_quote") or "").strip()
+            aspect = str(evidence.get("aspect") or "").strip()
+            # 推荐理由 = 通过审核/语义评估的活人感原句本身（网友真实评价即最佳种草理由）
+            reason = f"“{quote}”" if quote else "（原句缺失）"
+            source = "vetted_quote_v1"
+            if approved:
+                source = "human_approved_v1"
+            elif model_pass:
+                source = "semantic_pass_v1"
             reasons.append({
                 "content_id": card["content_id"],
                 "reason": reason,
+                "aspect": aspect,
                 "evidence_ids": [evidence["evidence_id"]],
                 "risk_flags": [],
-                "generation_source": "deterministic_template_v1",
+                "generation_source": source,
                 "human_confirmed": approved,
                 "review_status": "approved" if approved else "pending",
                 "prompt_version": card["prompt_version"],

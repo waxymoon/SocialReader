@@ -43,7 +43,7 @@ DELIVERABLES = ROOT / "deliverables"
 
 HEADERS = [
     "渠道来源", "一级品类", "二级品类", "美食话题", "标题", "内容类型",
-    "新品判断", "新品证据", "推荐理由（活人感原句）", "正文摘要", "代表评论",
+    "新品判断", "新品证据", "推荐理由（活人感原句）", "正文摘要",
     "作者", "发布时间", "点赞", "收藏", "评论数", "原链接",
 ]
 NOVELTY_LABEL_CN = {
@@ -113,22 +113,34 @@ def _evidence_score(ev: dict[str, Any]) -> float:
         return 0.0
 
 
-def pick_reasons(card: dict[str, Any], limit: int = 2) -> list[str]:
-    """推荐理由：与 build_reasons 同口径——人工驳回排除，规则 pass 或 人工通过 均可入选，按总分 top N。"""
-    evs = [
-        e for e in card.get("evidences") or []
-        if e.get("human_review_status") != "rejected"
-        and (e.get("rule_review_status") == "pass" or e.get("human_review_status") == "approved")
-    ]
-    evs.sort(key=_evidence_score, reverse=True)
+def pick_reasons(card: dict[str, Any], limit: int = 2, model_verdicts: dict[str, dict] | None = None) -> list[str]:
+    """推荐理由：人工 approved > 规则 pass > 语义模型 pass（②评估器），按总分 top N。
+
+    标注口径：人工通过无标注；规则通过=待人工终审；模型通过=语义通过·待人工（模型判断非人工）。
+    """
+    model_verdicts = model_verdicts or {}
+    evs = []
+    for e in card.get("evidences") or []:
+        if e.get("human_review_status") == "rejected":
+            continue
+        if e.get("rule_review_status") == "pass" or e.get("human_review_status") == "approved":
+            evs.append((e, "rule"))
+        elif model_verdicts.get(str(e.get("evidence_id")), {}).get("model_pass") \
+                or bool((e.get("model_review") or {}).get("pass")):
+            evs.append((e, "model"))
+    evs.sort(key=lambda pair: _evidence_score(pair[0]), reverse=True)
     reasons = []
-    for ev in evs[:limit]:
+    for ev, source in evs[:limit]:
         quote = str(ev.get("exact_quote") or "").strip()
         if not quote:
             continue
         aspect = str(ev.get("aspect") or "").strip()
-        confirmed = ev.get("human_review_status") == "approved"
-        suffix = "" if confirmed else "（规则通过·待人工终审）"
+        if ev.get("human_review_status") == "approved":
+            suffix = ""
+        elif source == "rule":
+            suffix = "（规则通过·待人工终审）"
+        else:
+            suffix = "（语义通过·待人工终审）"
         reasons.append(f"“{quote}”（{aspect}）{suffix}" if aspect else f"“{quote}”{suffix}")
     return reasons
 
@@ -149,18 +161,6 @@ def novelty_cell(card: dict[str, Any]) -> tuple[str, str]:
                 quotes.append(quote)
     return label_cn, "；".join(quotes)[:300]
 
-
-def comment_summary(md_item: dict[str, Any], limit: int = 3, width: int = 46) -> str:
-    comments = md_item.get("comments") or []
-    parts = []
-    for raw in comments[:limit]:
-        text = str(raw).strip()
-        text = text.split("：", 1)[-1] if "：" in text else text  # 去昵称头
-        text = re.sub(r"^[*\s]+", "", text)
-        if len(text) > width:
-            text = text[: width - 1] + "…"
-        parts.append(text)
-    return " ｜ ".join(parts)
 
 
 def truncate(text: Any, width: int = 80) -> str:
@@ -190,7 +190,8 @@ def effective_body(md: dict[str, Any], card: dict[str, Any]) -> str:
     return body
 
 
-def build_rows(cards: dict[str, dict[str, Any]], md_items: dict[str, dict[str, Any]], include_drinks: bool) -> tuple[list[list[Any]], dict[str, int]]:
+def build_rows(cards: dict[str, dict[str, Any]], md_items: dict[str, dict[str, Any]], include_drinks: bool,
+             model_verdicts: dict[str, dict] | None = None) -> tuple[list[list[Any]], dict[str, int]]:
     stats = {"total_cards": len(cards), "rows": 0, "filtered_drinks": 0, "unclassified": 0, "no_reason": 0}
     rows: list[list[Any]] = []
     for cid, card in cards.items():
@@ -211,7 +212,7 @@ def build_rows(cards: dict[str, dict[str, Any]], md_items: dict[str, dict[str, A
             stats["unclassified"] += 1
 
         label_cn, novelty_evidence = novelty_cell(card)
-        reasons = pick_reasons(card)
+        reasons = pick_reasons(card, model_verdicts=model_verdicts)
         if not reasons:
             stats["no_reason"] += 1
 
@@ -233,7 +234,6 @@ def build_rows(cards: dict[str, dict[str, Any]], md_items: dict[str, dict[str, A
             novelty_evidence,
             "；".join(reasons),
             truncate(body),
-            comment_summary(md),
             str(md.get("author") or card.get("author") or ""),
             str(md.get("published_at") or card.get("published_at") or ""),
             likes if likes is not None else "",
@@ -267,7 +267,7 @@ def write_xlsx(rows: list[list[Any]], out_path: Path, stats: dict[str, int], inc
     for row in rows:
         ws.append(row)
 
-    widths = [8, 10, 10, 14, 30, 8, 14, 30, 44, 36, 36, 12, 12, 8, 8, 8, 46]
+    widths = [8, 10, 10, 14, 30, 8, 14, 30, 44, 36, 12, 12, 8, 8, 8, 46]
     for idx, w in enumerate(widths, 1):
         ws.column_dimensions[get_column_letter(idx)].width = w
     for r in ws.iter_rows(min_row=2, max_row=ws.max_row, max_col=len(HEADERS)):
@@ -319,13 +319,41 @@ def write_xlsx(rows: list[list[Any]], out_path: Path, stats: dict[str, int], inc
     return out_path
 
 
-def run_export(include_drinks: bool = False, latest_only: bool = False, out_path: str | None = None) -> tuple[Path, dict[str, int]]:
-    """导出全量/最新 run 的新品知识库 xlsx，返回 (路径, 统计)。"""
+def run_export(include_drinks: bool = False, latest_only: bool = False, out_path: str | None = None,
+             semantic: bool = True) -> tuple[Path, dict[str, int]]:
+    """导出全量/最新 run 的新品知识库 xlsx，返回 (路径, 统计)。
+
+    semantic=True（默认）：对规则未过的句子调 DeepSeek 语义评估（②），
+    通过的句子进"推荐理由"列并标注"语义通过·待人工终审"，解决规则误杀梗句/空列问题。
+    """
     cards = collect_food_cards(latest_only=latest_only)
     if not cards:
         raise RuntimeError("没有找到 food_cards 数据，请先采集并分析")
     md_items = collect_md_items()
-    rows, stats = build_rows(cards, md_items, include_drinks=include_drinks)
+    model_verdicts: dict[str, dict] = {}
+    if semantic:
+        from evaluate_semantic import semantic_review_cards  # noqa: PLC0415
+        from domain_pipeline import DEFAULT_OUTPUT_ROOT  # noqa: PLC0415
+
+        # 评估范围 = 最新一次 run 的卡（演示聚焦刚跑完的采集；历史卡靠人工审核，避免几百句拖慢导出）
+        latest = sorted([p for p in DEFAULT_OUTPUT_ROOT.glob("*/*") if p.is_dir()],
+                        key=lambda p: p.stat().st_mtime)
+        latest_cids: set[str] = set()
+        if latest:
+            try:
+                from food_metrics import read_jsonl  # noqa: PLC0415
+                latest_cids = {c.get("content_id") for c in read_jsonl(latest[-1] / "food_cards.jsonl")}
+            except Exception:
+                latest_cids = set()
+        semantic_cards = [c for cid, c in cards.items() if cid in latest_cids]
+        skipped = len(cards) - len(semantic_cards)
+        if skipped:
+            print(f"[语义评估] 仅评估最新 run {len(semantic_cards)} 卡（跳过历史 {skipped} 卡，可用页面人工审核）")
+        model_verdicts = semantic_review_cards(semantic_cards)
+        n_pass = sum(1 for v in model_verdicts.values() if v.get("model_pass"))
+        if n_pass:
+            print(f"[语义评估] 模型判为活人感 {n_pass} 句（已并入推荐理由，待人工终审）")
+    rows, stats = build_rows(cards, md_items, include_drinks=include_drinks, model_verdicts=model_verdicts)
     if not rows:
         raise RuntimeError("知识库为空（可能全部被饮品过滤，可改用 include_drinks 查看）")
     path = Path(out_path) if out_path else DELIVERABLES / f"新品知识库_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
@@ -339,10 +367,12 @@ def main() -> int:
     parser.add_argument("--out", default=None, help="输出 xlsx 路径（默认 deliverables/新品知识库_<时间>.xlsx）")
     parser.add_argument("--include-drinks", action="store_true", help="包含饮品行（演示“过滤”效果用）")
     parser.add_argument("--latest-only", action="store_true", help="仅导出最新一次 run")
+    parser.add_argument("--no-semantic", action="store_true", help="关闭②语义评估（DeepSeek 判活人感）")
     args = parser.parse_args()
     try:
         out_path, stats = run_export(
-            include_drinks=args.include_drinks, latest_only=args.latest_only, out_path=args.out
+            include_drinks=args.include_drinks, latest_only=args.latest_only, out_path=args.out,
+            semantic=not args.no_semantic,
         )
     except RuntimeError as exc:
         print(str(exc))

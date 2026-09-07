@@ -113,6 +113,7 @@
           <button id="agentStartBtn" class="btn primary" type="button">开始 Agent</button>
           <button id="agentStopBtn" class="btn" type="button" disabled>停止</button>
           <button id="agentExportBtn" class="btn" type="button" disabled>收工后导出 Excel</button>
+          <button id="semanticBtn" class="btn" type="button">② 语义评估最新 run（模型判活人感）</button>
         </div>
         <div id="agentAsk" class="agent-ask" style="display:none">
           <b>🤖 Agent 提问：</b><span id="agentQuestion"></span>
@@ -152,7 +153,8 @@
       if(activeTab==='expressions') html=expr.map(e=>`<article class="item"><div class="meta"><span class="chip">${esc(e.source_type)}</span><span class="chip">${esc(e.evidence_location)}</span><span class="chip ${e.rule_review_status==='fail'?'fail':'real'}">规则 ${esc(e.rule_review_status)}</span><span class="chip">人工 ${esc(e.human_review_status)}</span></div><div class="quote">“${esc(e.exact_quote)}”</div><p>对象：${esc(e.target||'未识别')} · 维度：${esc(e.aspect)} · 原因：${esc(e.review_reason)}</p><div class="row"><button class="btn" data-review="approved" data-id="${esc(e.evidence_id)}">人工通过</button><button class="btn" data-review="rejected" data-id="${esc(e.evidence_id)}">人工驳回</button><button class="btn" data-review="pending" data-id="${esc(e.evidence_id)}">待确认</button></div></article>`).join('');
       if(activeTab==='reasons') html=reasons.map(r=>`<article class="item"><div class="quote">${esc(r.reason)}</div><p>证据：${esc((r.evidence_ids||[]).join('、'))}</p><div class="meta"><span class="chip">${esc(r.generation_source)}</span><span class="chip">${esc(r.prompt_version)}</span></div></article>`).join('');
       $('results').innerHTML=html||'<div class="empty">当前页签暂无结果。</div>'; document.querySelectorAll('[data-review]').forEach(btn=>btn.onclick=()=>review(btn.dataset.id,btn.dataset.review)); }
-    async function load(){ try{ update(await api('/api/food/latest')); }catch(error){ $('statusNote').textContent=error.message; } }
+    let loadRetried=false;
+    async function load(){ try{ const data=await api('/api/food/latest'); if(!data.available&&data.error){ $('statusNote').textContent='数据暂不可用：'+(data.error||''); return; } update(data); loadRetried=false; }catch(error){ if(!loadRetried){ loadRetried=true; setTimeout(load,2500); $('statusNote').textContent='加载失败，自动重试中…'; } else { loadRetried=false; $('statusNote').textContent=error.message; } } }
     async function plan(){ try{ const data=await api('/api/food/plan',{method:'POST',body:JSON.stringify({seed_category:$('seed').value,existing_queries:[]})}); if(!data.queries.length){$('queries').innerHTML='<div class="empty">没有生成候选关键词，换个品类试试。</div>';return;} $('queries').innerHTML='<div class="query-bar"><label class="hint">手动勾选要采集的关键词（默认全部不选，可多选批量跑）</label><button id="checkAllBtn" class="btn mini" type="button">全选</button><button id="checkNoneBtn" class="btn mini" type="button">清空</button></div>'+data.queries.map((q,i)=>`<label class="query"><input type="checkbox" value="${esc(q.query)}"><span><b>${esc(q.query)}</b><small>${esc(q.reason)} · 风险：${esc(q.risk)}</small></span></label>`).join(''); $('checkAllBtn').onclick=()=>document.querySelectorAll('#queries input[type=checkbox]').forEach(x=>x.checked=true); $('checkNoneBtn').onclick=()=>document.querySelectorAll('#queries input[type=checkbox]').forEach(x=>x.checked=false); }catch(error){ $('queries').innerHTML=`<div class="empty error">${esc(error.message)}</div>`; } }
     function checkedQueries(){ return [...document.querySelectorAll('#queries input:checked')].map(x=>x.value); }
     function checkedPlatforms(){ return [...document.querySelectorAll('.checks input:checked')].map(x=>x.value); }
@@ -192,7 +194,17 @@
       if(a.state==='done'&&a.stats){ $('agentState').textContent=`已完成 · 内容${a.stats.found_posts||0}条 · 活人感${a.stats.rule_pass_expressions||0}句`; }
       if(a.state==='done'||a.state==='error'||a.state==='stopped'){ clearInterval(agentTimer); agentTimer=null; }
     }
-    async function agentPoll(){ try{ const a=await agentStatus(); if(a)agentRender(a); }catch(e){ /* 服务重启等瞬时错误忽略 */ } }
+    let agentPrevState='', agentDoneLoaded=false;
+    async function agentPoll(){ try{
+      const a=await agentStatus();
+      if(a){
+        const st=a.state;
+        if(st==='done' && agentPrevState!=='done' && !agentDoneLoaded){ agentDoneLoaded=true; await load(); }
+        if(st!=='done') agentDoneLoaded=false;
+        agentPrevState=st;
+        agentRender(a);
+      }
+    }catch(e){ /* 瞬时错误忽略，下轮重试 */ } }
     async function agentStart(){
       const goal=$('agentGoal').value.trim();
       if(!goal){$('agentState').textContent='请输入目标';return;}
@@ -213,6 +225,7 @@
     }
     async function agentExport(){ try{ await exportKb(); }catch(e){ $('agentState').textContent='导出失败:'+e.message; } }
     $('agentStartBtn').onclick=agentStart; $('agentStopBtn').onclick=async()=>{try{await api('/api/agent/stop',{method:'POST',body:'{}'});}catch(e){}};
+    $('semanticBtn').onclick=async()=>{ $('semanticBtn').disabled=true; $('agentState').textContent='语义评估中（DeepSeek 判活人感）…'; try{ const d=await api('/api/food/semantic-review',{method:'POST',body:'{}'}); const s=d.semantic||{}; update(d); $('agentState').textContent=`语义评估完成：判为活人感 ${s.passed||0} 句（已入推荐理由·待人工终审）`; }catch(error){ $('agentState').textContent='语义评估失败:'+error.message; }finally{ $('semanticBtn').disabled=false; } };
     $('agentAnswerBtn').onclick=agentAnswer;
     $('agentAnswer').addEventListener('keydown',e=>{if(e.key==='Enter')agentAnswer();});
     $('agentExportBtn').onclick=agentExport;
