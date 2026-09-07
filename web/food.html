@@ -67,12 +67,19 @@
     .error { color:var(--danger); }
     @media(max-width:900px){ .setup,.result-grid{grid-template-columns:1fr}.hero{display:block}.scope{margin-top:14px}.status{grid-template-columns:repeat(3,1fr)} }
     @media(max-width:560px){ .grid{grid-template-columns:1fr}.status{grid-template-columns:repeat(2,1fr)} }
+  .agent-panel { border-left:4px solid #b34c32; grid-column:1/-1; }
+  .agent-log { max-height:340px; }
+  .agent-log { background:#2a2a2a; color:#e8e6df; padding:12px; border-radius:8px; font-size:12px; line-height:1.7; max-height:320px; overflow:auto; white-space:pre-wrap; word-break:break-all; margin-top:12px; font-family:Consolas,"Microsoft YaHei UI",monospace; }
+  .agent-ask { margin-top:12px; padding:10px 12px; background:#fff3da; border:1px solid #e6c984; border-radius:8px; }
+  .agent-ask b { color:#744219; }
   </style>
 </head>
 <body>
   <main class="shell">
     <header><div class="brand"><div class="mark">SR</div><div><b>SocialReader</b><small>通用采集底座 · food_v1</small></div></div><a class="back" href="/">← 通用采集</a></header>
-    <section class="hero"><div><h1>AI 美食社媒情报</h1><p>从已授权的公开内容中整理新品证据、品类属性与可回溯的用户原句。规则抽取、人工审核和推荐理由分开保存。</p></div><div class="scope">“热门”仅指同平台、同关键词、同一次可见候选池中的相对热门；不代表平台全站热榜。</div></section>
+    <section class="hero"><div><h1>AI 美食社媒情报</h1><p>从已授权的公开内容中整理新品证据、品类属性与可回溯的用户原句。规则抽取、人工审核和推荐理由分开保存。</p></div><div class="scope">“热门”仅指同平台、同关键词、同一次可见候选池中的相对热门；不代表平台全站热榜。</div>
+      
+</section>
 
     <section class="setup">
       <div class="card panel">
@@ -89,12 +96,31 @@
           <label><span>当前处理方式</span><select id="prompt" disabled><option value="prompt_v1">food_v1 本地规则（未调用模型）</option></select></label>
         </div>
         <div class="actions"><button id="planBtn" class="btn" type="button">预览关键词</button><button id="startBtn" class="btn primary" type="button">开始</button><button id="confirmBtn" class="btn" type="button" disabled>我已登录，继续</button><button id="stopBtn" class="btn" type="button" disabled>停止</button><button id="retryBtn" class="btn" type="button">重试失败</button><button id="exportBtn" class="btn" type="button">导出 Excel 知识库</button></div>
-      </div>
-      <div class="card panel">
+      </div><div class="card panel">
         <div class="panel-head"><div><h2>关键词扩展预览</h2><p>规则词库为主；切换勾选不会改变下方最近运行指标，点击“开始”后才更新。</p></div></div>
         <div id="queries" class="query-list"><div class="empty">点击“预览关键词”生成候选。</div></div>
       </div>
-    </section>
+    
+<div class="card panel agent-panel">
+        <div class="panel-head"><div><h2>🤖 Agent 模式（自主采集）</h2><p>给目标，Agent 自己决定搜什么词、判断够不够、不够就换词或问你。规则当手脚，模型当脑子。</p></div><span id="agentState" class="chip">未启动</span></div>
+        <div class="grid">
+          <label style="grid-column:1/-1"><span>目标</span><input id="agentGoal" value="找 2 个有活人感的新品话题" maxlength="120" placeholder="例：找 2 个有活人感的韩式炸鸡新品话题"></label>
+          <label><span>最大轮数</span><select id="agentRounds"><option value="3">3</option><option value="4" selected>4</option><option value="6">6</option><option value="8">8</option></select></label>
+          <label><span>每轮采集条数</span><select id="agentMax"><option value="2">2</option><option value="3" selected>3</option><option value="5">5</option></select></label>
+          <label><span>内容类型</span><select id="agentCt"><option value="image" selected>仅图文（快）</option><option value="all">全部</option><option value="video">仅视频</option></select></label>
+        </div>
+        <div class="actions">
+          <button id="agentStartBtn" class="btn primary" type="button">开始 Agent</button>
+          <button id="agentStopBtn" class="btn" type="button" disabled>停止</button>
+          <button id="agentExportBtn" class="btn" type="button" disabled>收工后导出 Excel</button>
+        </div>
+        <div id="agentAsk" class="agent-ask" style="display:none">
+          <b>🤖 Agent 提问：</b><span id="agentQuestion"></span>
+          <div style="display:flex;gap:8px;margin-top:8px"><input id="agentAnswer" style="flex:1" placeholder="输入你的回答…"><button id="agentAnswerBtn" class="btn primary" type="button">回复</button></div>
+        </div>
+        <pre id="agentLog" class="agent-log">Agent 尚未启动。启动后这里会实时滚动它的「思考→行动→观察」过程。</pre>
+      </div>
+</section>
 
     <section class="card status">
       <div class="metric"><strong id="currentQuery">—</strong><span>最近运行关键词</span></div>
@@ -134,6 +160,63 @@
     async function startLiveNext(){ if(!liveQueue.length){ $('startBtn').disabled=false; $('statusNote').textContent=`批量实时采集完成：${doneQueries.length} 个关键词已入库；点“导出 Excel 知识库”生成表格。`; return; } liveKeyword=liveQueue.shift(); const platforms=checkedPlatforms(); $('startBtn').disabled=true; $('currentQuery').textContent=liveKeyword; $('statusNote').textContent=`批量实时采集（${doneQueries.length+1}/${doneQueries.length+liveQueue.length+1}）正在抓「${liveKeyword}」…`; try{ await api('/api/start',{method:'POST',body:JSON.stringify({platform:platforms[0],query:liveKeyword,maximum:Number($('poolSize').value),content_type:$('contentType').value,model:$('asrModel').value})}); liveTimer=setInterval(pollLive,1100); await pollLive(); }catch(error){ $('startBtn').disabled=false; $('dataMode').value='pre'; $('statusNote').textContent='实时任务启动失败：'+error.message; } }
     async function analyze(path='/api/food/analyze-local'){ if($('dataMode').value==='live'){ const queries=checkedQueries(), platforms=checkedPlatforms(); if(!queries.length||!platforms.length){$('statusNote').textContent='请至少选择一个关键词和平台。';return;} liveQueue=queries.slice(); doneQueries=[]; liveQueueWasBatch=liveQueue.length>1; $('startBtn').disabled=true; if(liveQueue.length>1){$('statusNote').textContent=`批量实时采集：将依次抓取 ${liveQueue.length} 个关键词（${liveQueue.join('、')}），每词 ${$('poolSize').value} 条${$('contentType').value==='all'?'':'（'+$('contentType').options[$('contentType').selectedIndex].text+'）'}…`;} await startLiveNext(); return; } $('startBtn').disabled=true; $('statusNote').textContent='正在分析本地真实归档与任务书验收夹具…'; try{ const data=await api(path,{method:'POST',body:JSON.stringify({include_acceptance_fixtures:true})}); update(data); }catch(error){ $('statusNote').textContent=error.message; }finally{$('startBtn').disabled=false;} }
     async function exportKb(){ $('exportBtn').disabled=true; $('statusNote').textContent='正在导出 Excel 新品知识库（按最新真实采集，饮品已过滤）…'; try{ const data=await api('/api/food/export',{method:'POST',body:JSON.stringify({scope:'all'})}); $('statusNote').textContent=`知识库已导出（${data.stats?.rows||0} 行，过滤饮品 ${data.stats?.filtered_drinks||0} 条）：${data.path}，已为你打开 Excel`; }catch(error){ $('statusNote').textContent='导出失败：'+error.message; }finally{ $('exportBtn').disabled=false; } }
+    let agentTimer = null, agentLogCount = 0;
+    async function agentStatus(){ return (await api('/api/agent/status')).agent; }
+    function agentRender(a){
+      if(!a){ $('agentState').textContent='无会话'; $('agentState').className='chip'; return; }
+      const stMap={idle:'未启动',running:'运行中',awaiting_input:'等待你回复',done:'已完成',stopped:'已停止',error:'出错'};
+      $('agentState').textContent=stMap[a.state]||a.state;
+      $('agentState').className='chip '+(a.state==='done'?'real':(a.state==='error'||a.state==='stopped'?'fail':''));
+      if(a.logs && a.logs.length>agentLogCount){
+        const newLines=a.logs.slice(agentLogCount);
+        const box=$('agentLog');
+        let add='';
+        for(const ln of newLines){
+          const t=ln.replace(/</g,'&lt;');
+          let cls='';
+          if(t.includes('[Think]'))cls='think'; else if(t.includes('[Act')||t.includes('[执行]'))cls='act'; else if(t.includes('[校验]')||t.includes('[登录]')||t.includes('[超时]')||t.includes('[错误]'))cls='warn';
+          add+=`<span class="${cls}">${t}</span>\n`;
+        }
+        box.innerHTML+=add; box.scrollTop=box.scrollHeight; agentLogCount=a.logs.length;
+      }
+      const asking=a.state==='awaiting_input';
+      $('agentAsk').style.display=asking?'':'none';
+      if(asking){
+        const q=a.pending_question||'';
+        $('agentQuestion').textContent=(q==='__login_ready__')?'请在调试浏览器(9333)窗口完成小红书登录，登录好后点「回复」继续：':q;
+        $('agentAnswer').placeholder=(q==='__login_ready__')?'直接点回复即可':'输入你的回答…';
+      }
+      $('agentStartBtn').disabled=(a.state==='running'||a.state==='awaiting_input');
+      $('agentStopBtn').disabled=!(a.state==='running'||a.state==='awaiting_input');
+      $('agentExportBtn').disabled=!(a.state==='done');
+      if(a.state==='done'&&a.stats){ $('agentState').textContent=`已完成 · 内容${a.stats.found_posts||0}条 · 活人感${a.stats.rule_pass_expressions||0}句`; }
+      if(a.state==='done'||a.state==='error'||a.state==='stopped'){ clearInterval(agentTimer); agentTimer=null; }
+    }
+    async function agentPoll(){ try{ const a=await agentStatus(); if(a)agentRender(a); }catch(e){ /* 服务重启等瞬时错误忽略 */ } }
+    async function agentStart(){
+      const goal=$('agentGoal').value.trim();
+      if(!goal){$('agentState').textContent='请输入目标';return;}
+      $('agentLog').innerHTML=''; agentLogCount=0;
+      $('agentState').textContent='启动中…'; $('agentStartBtn').disabled=true;
+      try{
+        await api('/api/agent/start',{method:'POST',body:JSON.stringify({
+          goal, rounds:Number($('agentRounds').value), real_max:Number($('agentMax').value),
+          content_type:$('agentCt').value})});
+        agentTimer=setInterval(agentPoll,1100); await agentPoll();
+      }catch(error){ $('agentState').textContent='启动失败:'+error.message; $('agentStartBtn').disabled=false; }
+    }
+    async function agentAnswer(){
+      const a=await agentStatus();
+      const q=(a&&a.pending_question)||'';
+      const text=(q==='__login_ready__')?'ok':$('agentAnswer').value.trim();
+      try{ await api('/api/agent/answer',{method:'POST',body:JSON.stringify({text})}); $('agentAnswer').value=''; }catch(e){ alert(e.message); }
+    }
+    async function agentExport(){ try{ await exportKb(); }catch(e){ $('agentState').textContent='导出失败:'+e.message; } }
+    $('agentStartBtn').onclick=agentStart; $('agentStopBtn').onclick=async()=>{try{await api('/api/agent/stop',{method:'POST',body:'{}'});}catch(e){}};
+    $('agentAnswerBtn').onclick=agentAnswer;
+    $('agentAnswer').addEventListener('keydown',e=>{if(e.key==='Enter')agentAnswer();});
+    $('agentExportBtn').onclick=agentExport;
+    (async()=>{ try{ const a=await agentStatus(); if(a)agentRender(a); }catch(e){} })();
     async function review(id,status){ const reason=prompt(status==='rejected'?'请输入驳回原因：':'请输入审核说明：',status==='rejected'?'人工判断不可用':'页面人工审核')||''; if(!reason)return; try{ update(await api('/api/food/review',{method:'POST',body:JSON.stringify({evidence_id:id,status,reason})})); }catch(error){ alert(error.message); } }
     document.querySelectorAll('.tab').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));btn.classList.add('active');activeTab=btn.dataset.tab;render();});
     $('taskMode').onchange=()=>{if($('taskMode').value==='general')location.href='/';}; $('planBtn').onclick=plan; $('startBtn').onclick=()=>analyze(); $('retryBtn').onclick=()=>analyze('/api/food/retry'); $('exportBtn').onclick=exportKb; $('confirmBtn').onclick=async()=>{try{await api('/api/confirm-login',{method:'POST',body:'{}'});await pollLive();}catch(error){$('statusNote').textContent=error.message;}}; $('stopBtn').onclick=async()=>{try{await api('/api/stop',{method:'POST',body:'{}'});await pollLive();}catch(error){$('statusNote').textContent=error.message;}};

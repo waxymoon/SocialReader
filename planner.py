@@ -51,7 +51,7 @@ SYSTEM_PROMPT = """你是「美食情报采集 Agent」的决策大脑。你的�
 1. 只输出一个 JSON 对象，格式：{"action": "search|deep|wrapup|ask", "next_query": "关键词(仅search需要)", "reason": "一句话理由"}
 2. 不要输出 JSON 以外的任何文字、markdown 或解释。
 3. 不许编造采集结果——你只能基于状态快照里给出的真实数字做判断。
-4. wrapup 前先核对：状态里已获得的活人感表达是否达到目标要求？明显不足时不要 wrapup，优先 search 换词。
+4. wrapup 前先核对：状态里「已采集内容数」是否达到目标要求条数（见目标要求行）？不足时不要 wrapup，优先 search 换词补采。
 5. 连续失败或没进展时，诚实选 ask，不要假装成功。"""
 
 
@@ -217,12 +217,36 @@ def analyze_local_dir(query: str) -> dict[str, Any]:
             "local_posts": posts, "note": f"真实分析 {len(cards)} 卡 / 规则活人感 pass {passed} 句"}
 
 
+def _cli_ask(question: str) -> str | None:
+    """CLI 默认问答：普通问题走 input；__prompt_query__ 让用户给搜索词；
+    __login_ready__ 等登录回车。EOF（管道/后台）返回 None=放弃。"""
+    try:
+        if question == "__prompt_query__":
+            return input("请输入要搜的关键词（回车放弃）：").strip()
+        if question == "__login_ready__":
+            input("登录完成后按回车让 Agent 重试本轮：")
+            return "ok"
+        return input("🤖 Agent 提问：" + question + "\n你的回答（回车=让 Agent 自己定）：").strip()
+    except EOFError:
+        return None
+
+
+def parse_goal_number(goal: str) -> int:
+    """从目标里解析期望数量（如"找 2 个"→2）。无数字→1，上限 20。"""
+    m = re.search(r"(\d+)", goal or "")
+    n = int(m.group(1)) if m else 1
+    return max(1, min(n, 20))
+
+
 # ---------- 决策循环 ----------
-def build_state_prompt(goal: str, state: dict[str, Any], round_no: int, max_rounds: int) -> str:
+def build_state_prompt(goal: str, state: dict[str, Any], round_no: int, max_rounds: int,
+                    target: int | None = None) -> str:
+    target = target if target is not None else parse_goal_number(goal)
     samples = state.get("samples", [])
     sample_lines = "\n".join(f"  - {s}" for s in samples[-6:]) if samples else "  （暂无）"
     return f"""用户目标：{goal}
 当前轮次：{round_no}/{max_rounds}
+目标要求：至少 {target} 条合格内容（已获 {state.get('found_posts', 0)} 条，还差 {max(0, target - state.get('found_posts', 0))} 条）
 本轮状态快照（全部为真实数字）：
 - 已采集内容数：{state.get('found_posts', 0)}
 - 已获得活人感表达（规则+语义通过）：{state.get('rule_pass_expressions', 0)}
@@ -250,7 +274,12 @@ def validate_decision(raw: dict[str, Any], state: dict[str, Any], goal_note: str
 
 
 def run_loop(goal: str, max_rounds: int = 4, mode: str = "live", real_max: int = 3,
-            content_type: str = "image") -> dict[str, Any]:
+            content_type: str = "image", ask_fn=None,
+            on_log=None) -> dict[str, Any]:
+    if ask_fn is None:
+        ask_fn = _cli_ask
+    if on_log is None:
+        on_log = print
     if mode == "real":
         tool: Callable[[str], dict[str, Any]] | None = None  # 双阶段：agent_capture + analyze_local_dir
     else:
@@ -265,45 +294,46 @@ def run_loop(goal: str, max_rounds: int = 4, mode: str = "live", real_max: int =
     goal_note = re.sub(r"\d+", lambda m: "数字目标", goal)  # 防 prompt 注入式诱导（占位）
 
     for round_no in range(1, max_rounds + 1):
-        print(f"\n===== 第 {round_no}/{max_rounds} 轮 =====")
+        on_log(f"\n===== 第 {round_no}/{max_rounds} 轮 =====")
         # Think
-        prompt = build_state_prompt(goal, state, round_no, max_rounds)
+        prompt = build_state_prompt(goal, state, round_no, max_rounds,
+                                 target=parse_goal_number(goal))
         raw = ds_chat(prompt)
         decision = validate_decision(raw, state, goal_note)
-        print(f"[Think] action={decision['action']} query={decision['next_query'] or '—'} 理由={decision['reason']}")
+        on_log(f"[Think] action={decision['action']} query={decision['next_query'] or '—'} 理由={decision['reason']}")
 
         # Act
         if decision["action"] == "ask":
-            try:
-                answer = input("🤖 Agent 提问：" + decision["reason"] + "\n你的回答（回车=继续默认 search）：").strip()
-            except EOFError:  # 非交互环境（管道/后台）：ask 视为收工，避免悬挂
-                print("[无交互输入] ask 无应答，按收工处理")
+            answer = ask_fn(decision["reason"])
+            if answer is None:  # 非交互/用户放弃：收工
+                on_log("[无应答] ask 无应答，按收工处理")
                 break
-            if not answer:
-                decision = {"action": "search", "next_query": input("请输入要搜的关键词：").strip(), "reason": "人工指定"}
+            if not answer.strip():
+                decision = {"action": "search", "next_query": ask_fn("__prompt_query__"), "reason": "人工指定"}
             else:
                 state["last_human"] = answer
-                print(f"[人] {answer}（已记入状态，继续下一轮）")
+                on_log(f"[人] {answer}（已记入状态，继续下一轮）")
                 state["rounds"].append({"round": round_no, "action": "ask", "human": answer})
                 continue
 
         if decision["action"] == "wrapup":
-            # 防偷懒：目标数校验——不足则拒绝收工，让模型下一轮重新决策（不注入烂词）
-            if state["found_posts"] == 0 and round_no < max_rounds:
-                print("[校验] wrapup 被拒：尚无任何内容，下一轮重新决策")
+            # 达标校验：解析目标数 N，已获内容不足 N 且轮数未尽 → 打回重决策（不喊假完成）
+            target = parse_goal_number(goal)
+            if state["found_posts"] < target and round_no < max_rounds:
+                on_log(f"[校验] wrapup 被拒：目标 {target} 条，当前仅 {state['found_posts']} 条，下一轮继续补采")
                 state["rounds"].append({"round": round_no, "action": "wrapup_rejected",
                                         "query": "", "reason": decision["reason"]})
                 continue
             state["rounds"].append({"round": round_no, "action": "wrapup",
                                     "query": "", "reason": decision["reason"]})
-            print("[收工] 达成收工条件")
+            on_log("[收工] 达成收工条件")
             break
 
         # 执行工具
         query = decision.get("next_query") or ""
         if query:
             if query in state["used_queries"]:
-                print("[执行] 关键词重复，跳过本轮")
+                on_log("[执行] 关键词重复，跳过本轮")
                 state["rounds"].append({"round": round_no, "action": "skip", "reason": "重复词"})
                 continue
             state["used_queries"].append(query)
@@ -319,11 +349,13 @@ def run_loop(goal: str, max_rounds: int = 4, mode: str = "live", real_max: int =
             else:
                 obs = tool(query) if query else {"found_posts": 0, "rule_pass_expressions": 0, "note": "无关键词"}
         except LoginRequiredError as exc:
-            print(f"[登录] {exc}")
+            on_log(f"[登录] {exc}")
             try:
-                input("登录完成后按回车让 Agent 重试本轮（或 Ctrl+C 停止）：")
-            except EOFError:
-                print("[无交互] 登录未就绪，本轮放弃")
+                answer = ask_fn("__login_ready__")
+            except Exception:
+                answer = None
+            if answer is None:
+                on_log("[无交互] 登录未就绪，本轮放弃")
                 state["last_error"] = str(exc)
                 state["rounds"].append({"round": round_no, "action": "login_wait", "query": query,
                                         "reason": str(exc)})
@@ -340,7 +372,7 @@ def run_loop(goal: str, max_rounds: int = 4, mode: str = "live", real_max: int =
         state["last_error"] = obs.get("note") or ""
         for p in obs.get("local_posts") or []:
             state["samples"].append(f"{p.get('file', '')}｜{p.get('title', '')}")
-        print(f"[Act/Observe] {obs.get('note')} → 累计内容 {state['found_posts']}，活人感表达 {state['rule_pass_expressions']}")
+        on_log(f"[Act/Observe] {obs.get('note')} → 累计内容 {state['found_posts']}，活人感表达 {state['rule_pass_expressions']}")
         state["rounds"].append({"round": round_no, "action": decision["action"],
                                 "query": query, "reason": decision["reason"],
                                 "observation": obs.get("note", "")})
@@ -348,6 +380,91 @@ def run_loop(goal: str, max_rounds: int = 4, mode: str = "live", real_max: int =
     print("\n===== 循环结束 =====")
     print(f"累计：内容 {state['found_posts']} 条 / 活人感表达 {state['rule_pass_expressions']} 条 / 用词 {state['used_queries']}")
     return state
+
+
+class AgentSession:
+    """页面 Agent 会话：后台线程跑决策循环；ask 挂起等待人工回复（Event 同步）；
+    日志进 self.logs 供轮询；超时/停止可终止。"""
+
+    def __init__(self, goal: str, max_rounds: int = 4, mode: str = "real",
+                 real_max: int = 3, content_type: str = "image"):
+        self.goal = goal
+        self.max_rounds = max_rounds
+        self.mode = mode
+        self.real_max = real_max
+        self.content_type = content_type
+        self.logs: list[str] = []
+        self.state = "idle"          # idle|running|awaiting_input|done|stopped|error
+        self.pending_question = ""
+        self.answer_text = ""
+        self.state_dict: dict[str, Any] = {}
+        self._event = __import__("threading").Event()
+        self._stop = False
+        self._thread = None
+
+    def _log(self, text: str) -> None:
+        self.logs.append(str(text))
+        if len(self.logs) > 500:
+            self.logs = self.logs[-400:]
+
+    def _ask(self, question: str) -> str | None:
+        if self._stop:
+            return None
+        self.pending_question = question
+        self.state = "awaiting_input"
+        self._event.clear()
+        self._event.wait(timeout=900)  # 15 分钟无回复按放弃
+        if not self._event.is_set():
+            self.state = "error"
+            self._log("[超时] 等待人工回复超时，会话结束")
+            return None
+        return self.answer_text
+
+    def start(self) -> None:
+        if self._thread and self._thread.is_alive():
+            raise RuntimeError("Agent 已在运行")
+        self.logs = []
+        self.state = "running"
+        self._stop = False
+        self._thread = __import__("threading").Thread(
+            target=self._run, daemon=True, name="agent-session")
+        self._thread.start()
+
+    def _run(self) -> None:
+        try:
+            self.state_dict = run_loop(
+                self.goal, self.max_rounds, self.mode,
+                real_max=self.real_max, content_type=self.content_type,
+                ask_fn=self._ask, on_log=self._log)
+            if self.state != "error":
+                self.state = "done"
+            self._log(f"[完成] 累计：内容 {self.state_dict.get('found_posts', 0)} 条 / "
+                      f"活人感表达 {self.state_dict.get('rule_pass_expressions', 0)} 条")
+        except Exception as exc:  # noqa: BLE001
+            self.state = "error"
+            self._log(f"[错误] {type(exc).__name__}: {exc}")
+
+    def answer(self, text: str) -> None:
+        self.answer_text = str(text or "").strip()
+        self.pending_question = ""
+        self._event.set()
+
+    def stop(self) -> None:
+        self._stop = True
+        self._event.set()
+
+    def status(self) -> dict[str, Any]:
+        return {
+            "state": self.state,
+            "goal": self.goal,
+            "mode": self.mode,
+            "logs": self.logs[-200:],
+            "pending_question": self.pending_question,
+            "stats": self.state_dict,
+        }
+
+
+AGENT_SESSION: AgentSession | None = None
 
 
 def main() -> int:

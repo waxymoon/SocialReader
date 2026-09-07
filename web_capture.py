@@ -30,6 +30,7 @@ from domain_pipeline import (
     update_review,
 )
 from export_knowledge_base import run_export
+import planner as _planner
 from food_metrics import read_jsonl
 
 
@@ -404,6 +405,10 @@ class SocialReaderHandler(BaseHTTPRequestHandler):
         if parsed.path == "/api/files":
             self._json({"ok": True, "files": recent_markdown()})
             return
+        if parsed.path == "/api/agent/status":
+            session = _planner.AGENT_SESSION
+            self._json({"ok": True, "agent": session.status() if session else None})
+            return
         if parsed.path == "/api/food/config":
             manifest, keywords = load_food_config()
             self._json({"ok": True, "manifest": manifest, "keywords": keywords, "real_sample_count": len(list(FOOD_SAMPLE_ROOT.glob("*.md"))) - int((FOOD_SAMPLE_ROOT / "_汇总.md").exists())})
@@ -483,6 +488,41 @@ class SocialReaderHandler(BaseHTTPRequestHandler):
                 except Exception:
                     pass
                 self._json({"ok": True, "path": str(path), "stats": stats})
+                return
+            if self.path == "/api/agent/start":
+                goal = str(payload.get("goal", "")).strip()
+                if not goal or len(goal) > 120:
+                    raise ValueError("目标不能为空且不超过 120 字")
+                rounds = int(payload.get("rounds", 4))
+                if not 1 <= rounds <= 8:
+                    raise ValueError("轮数必须在 1–8")
+                real_max = int(payload.get("real_max", 3))
+                if not 1 <= real_max <= 5:
+                    raise ValueError("每轮采集 1–5 条")
+                content_type = str(payload.get("content_type", "image"))
+                if content_type not in {"all", "image", "video"}:
+                    raise ValueError("内容类型参数无效")
+                cur = _planner.AGENT_SESSION
+                if cur and cur.state in ("running", "awaiting_input"):
+                    raise RuntimeError("已有 Agent 任务在运行，请先停止")
+                session = _planner.AgentSession(goal=goal, max_rounds=rounds, mode="real",
+                                                real_max=real_max, content_type=content_type)
+                _planner.AGENT_SESSION = session
+                session.start()
+                self._json({"ok": True, "agent": session.status()})
+                return
+            if self.path == "/api/agent/answer":
+                session = _planner.AGENT_SESSION
+                if not session or session.state != "awaiting_input":
+                    raise RuntimeError("当前没有等待回复的 Agent")
+                session.answer(str(payload.get("text", "")))
+                self._json({"ok": True, "agent": session.status()})
+                return
+            if self.path == "/api/agent/stop":
+                session = _planner.AGENT_SESSION
+                if session:
+                    session.stop()
+                self._json({"ok": True, "agent": session.status() if session else None})
                 return
             if self.path == "/api/confirm-login":
                 self._json({"ok": True, "job": JOBS.confirm_login()})
