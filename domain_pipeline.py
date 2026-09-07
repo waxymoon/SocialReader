@@ -458,8 +458,15 @@ def validate_card(card: dict[str, Any]) -> list[dict[str, str]]:
 def build_reasons(cards: list[dict[str, Any]]) -> list[dict[str, Any]]:
     reasons: list[dict[str, Any]] = []
     for card in cards:
-        approved = [e for e in card.get("evidences", []) if e.get("human_review_status") == "approved" and e.get("rule_review_status") == "pass" and not e.get("risk_flags")]
-        for evidence in approved:
+        # 人工是最终裁判：人工 approved 可覆盖规则 fail（错字/词库未覆盖等）；
+        # 仅规则 pass 的证据也生成（标记 pending，等人工终审）；人工 rejected 一律排除。
+        for evidence in card.get("evidences", []):
+            if evidence.get("human_review_status") == "rejected":
+                continue
+            if not (evidence.get("rule_review_status") == "pass" or evidence.get("human_review_status") == "approved"):
+                continue
+            if evidence.get("risk_flags"):
+                continue
             if evidence.get("aspect") == "新品证据":
                 continue
             target = evidence.get("target") or "这道美食"
@@ -467,12 +474,15 @@ def build_reasons(cards: list[dict[str, Any]]) -> list[dict[str, Any]]:
             reason = f"{target}{attribute}有记忆点，适合想吃点有滋味的时候。"
             if not 15 <= len(reason.rstrip("。")) <= 35:
                 reason = f"{target}{attribute}，适合想换换口味的时候。"
+            approved = evidence.get("human_review_status") == "approved"
             reasons.append({
                 "content_id": card["content_id"],
                 "reason": reason,
                 "evidence_ids": [evidence["evidence_id"]],
                 "risk_flags": [],
                 "generation_source": "deterministic_template_v1",
+                "human_confirmed": approved,
+                "review_status": "approved" if approved else "pending",
                 "prompt_version": card["prompt_version"],
             })
     return reasons
@@ -617,6 +627,14 @@ def run_analysis(items: list[dict[str, Any]], output_root: Path = DEFAULT_OUTPUT
     (output_dir / "report.md").write_text(_report(cards, reasons, run_meta), encoding="utf-8", newline="\n")
     (output_root / "latest_run.txt").parent.mkdir(parents=True, exist_ok=True)
     (output_root / "latest_run.txt").write_text(str(output_dir), encoding="utf-8", newline="\n")
+    # 跨 run 继承人工审核状态（approved/rejected），避免重新分析丢标注
+    try:
+        inherited = inherit_human_reviews(output_dir, run_root=output_root)
+        if inherited.get("approved") or inherited.get("rejected"):
+            run_meta["inherited_reviews"] = inherited
+            (output_dir / "run_meta.json").write_text(json.dumps(run_meta, ensure_ascii=False, indent=2), encoding="utf-8", newline="\n")
+    except Exception:
+        pass  # 继承失败不阻断分析（历史 run 缺失/损坏时静默降级）
     return output_dir
 
 
@@ -626,6 +644,55 @@ def load_analysis_items(input_dir: Path, include_fixtures: bool = False, limit: 
     if include_fixtures:
         items.extend(read_jsonl(ACCEPTANCE_FIXTURES))
     return items
+
+
+def inherit_human_reviews(output_dir: Path, run_root: Path = DEFAULT_OUTPUT_ROOT) -> dict[str, int]:
+    """把历史 run 的人工审核状态（approved/rejected+原因）继承到新 run 的相同证据上。
+
+    合并键 = evidence_id（跨 run 稳定：content_id+证据序号）。只覆盖新 run 中仍为
+    pending 的证据（本 run 刚标过的不覆盖）。无历史或全 pending 时 no-op。
+    """
+    cards = read_jsonl(output_dir / "food_cards.jsonl")
+    if not cards:
+        return {"approved": 0, "rejected": 0}
+    history: dict[str, tuple[str, str]] = {}
+    for run_dir in sorted(run_root.glob("*/*"), key=lambda p: p.stat().st_mtime):
+        if run_dir.resolve() == output_dir.resolve():
+            continue
+        rp = run_dir / "review_results.jsonl"
+        if not rp.is_file():
+            continue
+        for row in read_jsonl(rp):
+            hid = str(row.get("evidence_id") or "")
+            status = str(row.get("human_review_status") or "")
+            if hid and status in ("approved", "rejected"):
+                history.setdefault(hid, (status, str(row.get("review_reason") or "")))
+    if not history:
+        return {"approved": 0, "rejected": 0}
+    counts = {"approved": 0, "rejected": 0}
+    changed = False
+    for card in cards:
+        for evidence in card.get("evidences", []):
+            if evidence.get("human_review_status") != "pending":
+                continue
+            hid = str(evidence.get("evidence_id") or "")
+            if hid not in history:
+                continue
+            status, reason = history[hid]
+            evidence["human_review_status"] = status
+            evidence["review_reason"] = reason or ("人工审核继承" if status == "approved" else "人工驳回继承")
+            counts[status] = counts.get(status, 0) + 1
+            changed = True
+    if changed:
+        reasons = build_reasons(cards)
+        write_jsonl(output_dir / "food_cards.jsonl", cards)
+        write_jsonl(output_dir / "vivid_expressions.jsonl", [e for c in cards for e in c.get("evidences", [])])
+        write_jsonl(output_dir / "review_results.jsonl", [
+            {key: e.get(key) for key in ("evidence_id", "content_id", "exact_quote", "rule_review_status", "human_review_status", "review_reason", "risk_flags")}
+            for c in cards for e in c.get("evidences", [])
+        ])
+        write_jsonl(output_dir / "recommendation_reasons.jsonl", reasons)
+    return counts
 
 
 def update_review(output_dir: Path, evidence_id: str, status: str, reason: str) -> dict[str, Any]:

@@ -114,8 +114,12 @@ def _evidence_score(ev: dict[str, Any]) -> float:
 
 
 def pick_reasons(card: dict[str, Any], limit: int = 2) -> list[str]:
-    """推荐理由：规则审核 pass 的活人感原句按总分 top N。"""
-    evs = [e for e in card.get("evidences") or [] if e.get("rule_review_status") == "pass"]
+    """推荐理由：与 build_reasons 同口径——人工驳回排除，规则 pass 或 人工通过 均可入选，按总分 top N。"""
+    evs = [
+        e for e in card.get("evidences") or []
+        if e.get("human_review_status") != "rejected"
+        and (e.get("rule_review_status") == "pass" or e.get("human_review_status") == "approved")
+    ]
     evs.sort(key=_evidence_score, reverse=True)
     reasons = []
     for ev in evs[:limit]:
@@ -123,7 +127,9 @@ def pick_reasons(card: dict[str, Any], limit: int = 2) -> list[str]:
         if not quote:
             continue
         aspect = str(ev.get("aspect") or "").strip()
-        reasons.append(f"“{quote}”（{aspect}）" if aspect else f"“{quote}”")
+        confirmed = ev.get("human_review_status") == "approved"
+        suffix = "" if confirmed else "（规则通过·待人工终审）"
+        reasons.append(f"“{quote}”（{aspect}）{suffix}" if aspect else f"“{quote}”{suffix}")
     return reasons
 
 
